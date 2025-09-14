@@ -20,7 +20,7 @@ git clone -b mps/2024.3 https://github.com/JetBrains/MPS-extensions.git
 **Download UDML:**
 
 ```
-git clone https://github.com/vnu-sme/udml-syntax-kse2025.git
+git@github.com:vnu-sme/ConstraintAnnotationPattern_CAPs.git
 ```
 
 After downloading, make sure to import these projects into JetBrains MPS to get started. If you encounter issues with importing, you can also open multiple projects in separate windows simultaneously.
@@ -38,7 +38,7 @@ After downloading, make sure to import these projects into JetBrains MPS to get 
     Open JetBrains MPS and create a new project. Create new solution add import the following language modules: UDML.core, UDML.diagram, UDML.dcsl, UDML.agl, UDML.rbac, UDML.gui.
 
 **2. Domain Model Definition:**
-    Use the Instructor to define metaconcepts for each concern DSL. Import the UDML.core language and set the **"Scope"** value to "Extend". You can also select an existing module (such as UDML.dcsl for structure, UDML.agl for behavior, or UDML.rbac for security, etc). 
+    Use the Instructor to define metaconcepts for each concern DSL. Import the UDML.core language and set the **"Scope"** value to "Extend". You can also select an existing module (such as UDML.dcsl for structure). 
 
 Define classes, attributes, relationships, and annotations according to your system requirements. Make sure to inherit from the concepts provided in UDML.core
 

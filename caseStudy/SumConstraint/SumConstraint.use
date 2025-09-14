@@ -1,0 +1,145 @@
+model courseMan
+
+class Student
+attributes
+    id : Integer
+    name : String
+    curSemester : Integer
+    curYear : Integer
+    major1 : String
+    isDualMajor: Boolean
+    maxTuitionLimit : Integer
+    exemptedFromMinCredits : Boolean
+    previousSemGPA : Real
+    academicStatus : String
+    gpa : Real
+    withdrawalsLastSem : Integer
+    totalCreditsCurSem : Integer
+    totalTuition : Integer
+end    
+
+class SClass
+attributes
+    id : Integer
+    name : String
+end
+
+class CourseModule
+attributes
+    id : Integer
+    name : String
+    semester : Integer
+    credits : Integer
+    type : String
+    tuitionFee : Integer
+    level : String
+    hasLab : Boolean
+end
+
+associationclass Enrolments
+between
+    Student[1..*] role student 
+    CourseModule[*] role course
+attributes
+    id : Integer
+    internalMark : Real
+    examMark : Real
+    finalGrade : String
+    semester : Integer
+    program : String
+end
+
+associationclass SClassRegistration
+between
+    Student[*] role student
+    SClass[1..*] role sclass
+attributes
+    id : Integer
+end
+
+constraints
+
+--The total displayed tuition fee for a student must equal the sum of tuition fees for all courses registered in the current semester.
+context Student
+inv T1_TotalTuitionEqualsSum:
+  let s = self.enrolments->select(e | e.semester = self.curSemester)
+          ->collect(e | e.course.tuitionFee)->sum()
+  in s = self.totalTuition
+
+--The total number of credits currently displayed must exactly match the sum of credits for all courses in the current semester.
+context Student
+inv T2_TotalCreditsEqualsSum:
+  self.totalCreditsCurSem =
+    self.enrolments->select(e | e.semester = self.curSemester)
+    ->collect(e | e.course.credits)->sum()
+
+--The total tuition fee for the current semester must not exceed the student's individual limit.
+context Student
+inv T3_TuitionWithinLimit:
+  let s = self.enrolments->select(e | e.semester = self.curSemester)
+          ->collect(e | e.course.tuitionFee)->sum()
+  in s <= self.maxTuitionLimit   
+  
+--The total number of credits per semester must not exceed 30.
+context Student
+inv T4_MaxCreditsPerTerm:
+  let s = self.enrolments->select(e | e.semester = self.curSemester)
+          ->collect(e | e.course.credits)->sum()
+  in s <= 30
+  
+--Students must complete a minimum of 15 credits in the semester, unless an exemption flag is set.
+context Student
+inv T5_MinCreditsUnlessExempt:
+  let s = self.enrolments->select(e | e.semester = self.curSemester)
+          ->collect(e | e.course.credits)->sum()
+  in (not self.exemptedFromMinCredits) implies s >= 15  
+  
+--When the GPA of the previous semester is less than 2.5, the total number of credits for the current semester must be less than or equal to 20.
+context Student
+inv T6_GPA_Cap20:
+  let s = self.enrolments->select(e | e.semester = self.curSemester)
+          ->collect(e | e.course.credits)->sum()
+  in self.previousSemGPA < 2.5 implies s <= 20
+  
+ context Student inv T61_LowGPALabRestriction:
+let sum = self.enrolments->select(e | e.course.hasLab =
+true and e.semester = self.curSemester)->collect(e | e.course.credits)
+->sum() in self.gpa < 2.5 implies sum <= 6
+ 
+--When in PROBATION status, the number of ADVANCED courses in the semester must be ≤ 2 (counting elements).
+context Student inv T7_ProbationAdvancedLimit:
+    let sum = self.enrolments->select(e | e.course.level
+    = 'ADVANCED' and e.semester = self.curSemester)
+    ->collect(e | 1)->sum() in self.academicStatus 
+    = 'PROBATION' implies sum <= 2
+    
+context Student inv T71_FirstYearElectiveLimit:
+let sum = self.enrolments->
+select(e | e.course.type = 'ELECTIVE' and
+e.semester = self.curSemester)->
+collect(e | e.course.credits)->sum() in
+self.curYear = 1 implies sum <= 3
+
+--If the number of course withdrawals in the previous semester is greater than 2, the total credits for the current semester must be less than or equal to 12.
+context Student
+inv T8_WithdrawalPenalty:
+  let s = self.enrolments->select(e | e.semester = self.curSemester)
+          ->collect(e | e.course.credits)->sum()
+  in self.withdrawalsLastSem > 2 implies s <= 12
+  
+--Dual-degree students must complete ≥ 12 credits for each major in the semester (illustrated for major1; apply similarly for major2).
+ context Student
+  inv T9_MinPerMajor1:
+  let s = self.enrolments
+            ->select(e | e.semester = self.curSemester and e.program = self.major1)
+            ->collect(e | e.course.credits)->sum()
+  in self.isDualMajor implies s >= 12
+  
+ --A combined min & max policy on the same criterion: First-year students must register for between 12 and 18 credits in the current semester.
+context Student
+inv T10_Year1_12to18:
+  let s = self.enrolments->select(e | e.semester = self.curSemester)
+          ->collect(e | e.course.credits)->sum()
+  in self.curYear = 1 implies (s >= 12 and s <= 18)
+  
+

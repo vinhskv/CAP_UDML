@@ -1,0 +1,117 @@
+/* CSS style file */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header, footer {
+    background-color: #1057C1;
+    color: #fff;
+    text-align: center;
+    padding: 15px 0;
+}
+
+.container {
+    width: 90%;
+    margin: 20px auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.btn {
+    display: inline-block;
+    background-color: #3498db;
+    color: #fff;
+    padding: 8px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+.btn:hover {
+    background-color: #2980b9;
+}
+
+.form-container {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+
+/* Style the submit button with a specific background color etc background-color: #04AA6D;
+  color: white;*/
+input {
+  
+  border: 2px solid purple;  border-radius: 4px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* When moving the mouse over the submit button, add a darker green color */
+input:hover {
+ border: 1px solid purple;  border-radius: 4px;
+ 
+}
+
+/* Add a background color and some padding around the form */
+.container {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+ul {
+  list-style-type: none;
+}
+.footer{
+ background: #1057C1;
+ position: absolute;
+ bottom: 0;
+ width: 100%; 
+}
+.error-message {
+    color: red;
+    font-size: 0.9em;
+}

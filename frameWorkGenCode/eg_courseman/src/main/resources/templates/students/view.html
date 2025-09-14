@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: header}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Student Details</h2>
+            <div class="btn-group">
+                <a th:href="@{/students}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a th:href="@{/students/recalculate/{id}(id=${student.id})}" class="btn btn-info">
+                    <i class="fas fa-sync"></i> Recalculate Stats
+                </a>
+                <a th:href="@{/enrolments/new}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Enrolment
+                </a>
+            </div>
+        </div>
+        
+        <!-- Message Alerts -->
+        <div class="alert alert-success alert-dismissible fade show" th:if="${successMessage}" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        
+        <div class="alert alert-danger alert-dismissible fade show" th:if="${errorMessage}" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        
+        <!-- Student Info Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 th:text="${student.name}" class="card-title mb-0"></h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">ID</dt>
+                            <dd class="col-sm-8" th:text="${student.id}"></dd>
+                            
+                            <dt class="col-sm-4">Name</dt>
+                            <dd class="col-sm-8" th:text="${student.name}"></dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Total Credits</dt>
+                            <dd class="col-sm-8">
+                                <span th:text="${#numbers.formatDecimal(student.totalCredits, 1, 1)}"></span>
+                                <small class="text-muted">(automatically calculated)</small>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Average Grade</dt>
+                            <dd class="col-sm-8">
+                                <span th:text="${#numbers.formatDecimal(student.average, 1, 2)}"></span>
+                                <small class="text-muted">(automatically calculated)</small>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-info">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Credits</h5>
+                        <p class="card-text display-4" th:text="${#numbers.formatDecimal(student.totalCredits, 1, 1)}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Average Grade</h5>
+                        <p class="card-text display-4" th:text="${#numbers.formatDecimal(student.average, 1, 2)}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-primary">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Sum Product</h5>
+                        <p class="card-text display-4" th:text="${#numbers.formatDecimal(student.sumProduct, 1, 2)}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enrolments Section -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Enrolments</h4>
+                <a th:href="@{/enrolments/student/{id}(id=${student.id})}" class="btn btn-sm btn-light">
+                    <i class="fas fa-list"></i> View All
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info" th:if="${student.enrolments == null || student.enrolments.empty}">
+                    No enrolments found for this student.
+                </div>
+                <div class="table-responsive" th:if="${student.enrolments != null && !student.enrolments.empty}">
+                    <table class="table table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Course</th>
+                                <th>Credits</th>
+                                <th>Internal Mark</th>
+                                <th>Exam Mark</th>
+                                <th>Final Grade</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="enrolment : ${student.enrolments}">
+                                <td th:text="${enrolment.courseModule.name + ' (' + enrolment.courseModule.code + ')'}"></td>
+                                <td th:text="${enrolment.courseModule.credits}"></td>
+                                <td th:text="${enrolment.internalMark}"></td>
+                                <td th:text="${enrolment.examMark}"></td>
+                                <td>
+                                    <span th:if="${enrolment.finalGrade != null}" 
+                                          th:text="${#numbers.formatDecimal(enrolment.finalGrade, 1, 2)}"
+                                          th:class="${enrolment.finalGrade >= 5.0 ? 'text-success' : 'text-danger'}">
+                                    </span>
+                                    <span th:unless="${enrolment.finalGrade != null}" class="text-muted">N/A</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/enrolments/edit/{id}(id=${enrolment.id})}" class="btn btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a th:href="@{/enrolments/grades/{id}(id=${enrolment.id})}" class="btn btn-info">
+                                            <i class="fas fa-graduation-cap"></i>
+                                        </a>
+                                        <a th:href="@{/enrolments/delete/{id}(id=${enrolment.id})}" 
+                                           class="btn btn-danger"
+                                           onclick="return confirm('Are you sure you want to delete this enrolment?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    
+    <!-- JavaScript for auto-hide alert messages -->
+    <script>
+        // Auto-hide alert messages after 5 seconds
+        window.setTimeout(function() {
+            $(".alert-success, .alert-danger").fadeTo(500, 0).slideUp(500, function(){
+                $(this).remove(); 
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

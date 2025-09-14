@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: header}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Course Details</h2>
+            <div class="btn-group">
+                <a th:href="@{/courses}" class="btn btn-secondary">Back to List</a>
+                <a th:href="@{/courses/edit/{id}(id=${course.id})}" class="btn btn-warning">Edit</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 th:text="${course.code + ' - ' + course.name}" class="card-title mb-0"></h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">ID</dt>
+                    <dd class="col-sm-9" th:text="${course.id}"></dd>
+                    
+                    <dt class="col-sm-3">Code</dt>
+                    <dd class="col-sm-9" th:text="${course.code}"></dd>
+                    
+                    <dt class="col-sm-3">Name</dt>
+                    <dd class="col-sm-9" th:text="${course.name}"></dd>
+                    
+                    <dt class="col-sm-3">Semester</dt>
+                    <dd class="col-sm-9" th:text="${course.semester}"></dd>
+                    
+                    <dt class="col-sm-3">Credits</dt>
+                    <dd class="col-sm-9" th:text="${course.credits}"></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+</body>
+</html>

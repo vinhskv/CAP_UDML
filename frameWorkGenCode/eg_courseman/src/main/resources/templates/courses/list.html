@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: header}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Course Modules</h2>
+            <a th:href="@{/courses/new}" class="btn btn-primary">Add New Course</a>
+        </div>
+
+        <div class="alert alert-info" th:if="${courses.empty}">
+            No courses found. Please add a new course.
+        </div>
+
+        <div class="table-responsive" th:if="${!courses.empty}">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Semester</th>
+                        <th>Credits</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="course : ${courses}">
+                        <td th:text="${course.id}"></td>
+                        <td th:text="${course.code}"></td>
+                        <td th:text="${course.name}"></td>
+                        <td th:text="${course.semester}"></td>
+                        <td th:text="${course.credits}"></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a th:href="@{/courses/view/{id}(id=${course.id})}" class="btn btn-info">View</a>
+                                <a th:href="@{/courses/edit/{id}(id=${course.id})}" class="btn btn-warning">Edit</a>
+                                <a th:href="@{/courses/delete/{id}(id=${course.id})}" 
+                                   class="btn btn-danger"
+                                   onclick="return confirm('Are you sure you want to delete this course?')">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+</body>
+</html>

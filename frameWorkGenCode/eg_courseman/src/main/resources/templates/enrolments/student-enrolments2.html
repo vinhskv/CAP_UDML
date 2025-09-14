@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký khóa học của sinh viên</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row mb-3">
+            <div class="col">
+                <h2>Đăng ký khóa học của sinh viên</h2>
+                <h4 th:text="${'Sinh viên: ' + student.name}"></h4>
+            </div>
+            <div class="col text-end">
+                <a th:href="@{/students/view/{id}(id=${student.id})}" class="btn btn-secondary">Quay lại</a>
+                <a th:href="@{/enrolments/new(studentId=${student.id})}" class="btn btn-primary">Thêm đăng ký</a>
+            </div>
+        </div>
+        
+        <!-- Thông báo -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+      
+        <!-- Thông báo lỗi -->
+<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${errorMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<!-- Hiển thị tổng số tín chỉ với màu cảnh báo nếu gần đạt ngưỡng -->
+<div class="col-md-4">
+    <div th:class="${student.totalCredits > 12 ? 'card text-white bg-warning' : 'card text-white bg-primary'}">
+        <div class="card-body">
+            <h5 class="card-title">Tổng tín chỉ</h5>
+            <p class="card-text h2" th:text="${student.totalCredits != null ? #numbers.formatDecimal(student.totalCredits, 1, 1) : '0'}"></p>
+            <p th:if="${student.totalCredits > 12}" class="card-text small">Gần đạt ngưỡng tối đa (15 tín chỉ)</p>
+        </div>
+    </div>
+</div>
+          <!-- -------------------- -->
+        <!-- Thông tin tổng hợp -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                Thông tin tổng hợp
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Tổng tín chỉ</h5>
+                                <p class="card-text h2" th:text="${student.totalCredits != null ? #numbers.formatDecimal(student.totalCredits, 1, 1) : '0'}"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success">
+                            <div class="card-body">
+                                <h5 class="card-title">Tổng điểm</h5>
+                                <p class="card-text h2" th:text="${student.sumProduct != null ? #numbers.formatDecimal(student.sumProduct, 1, 2) : '0'}"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-warning">
+                            <div class="card-body">
+                                <h5 class="card-title">Điểm trung bình</h5>
+                                <p class="card-text h2" th:text="${student.average != null ? #numbers.formatDecimal(student.average, 1, 2) : '0'}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bảng danh sách đăng ký -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                Danh sách đăng ký khóa học
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Khóa học</th>
+                                <th>Mã</th>
+                                <th>Tín chỉ</th>
+                                <th>Điểm quá trình</th>
+                                <th>Điểm thi</th>
+                                <th>Điểm tổng kết</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="enrolment : ${enrolments}">
+                                <td th:text="${enrolment.id}"></td>
+                                <td th:text="${enrolment.courseModule.name}"></td>
+                                <td th:text="${enrolment.courseModule.code}"></td>
+                                <td th:text="${enrolment.courseModule.credits}"></td>
+                                <td th:text="${enrolment.internalMark != null ? #numbers.formatDecimal(enrolment.internalMark, 1, 2) : '-'}"></td>
+                                <td th:text="${enrolment.examMark != null ? #numbers.formatDecimal(enrolment.examMark, 1, 2) : '-'}"></td>
+                                <td th:text="${enrolment.finalGrade != null ? #numbers.formatDecimal(enrolment.finalGrade, 1, 2) : '-'}"></td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/enrolments/grades/{id}(id=${enrolment.id})}" class="btn btn-primary btn-sm">Nhập điểm</a>
+                                        <a th:href="@{/enrolments/edit/{id}(id=${enrolment.id})}" class="btn btn-warning btn-sm">Sửa</a>
+                                        <a th:href="@{/enrolments/delete/{id}(id=${enrolment.id})}" class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa đăng ký này?')">Xóa</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${enrolments == null || enrolments.empty}">
+                                <td colspan="8" class="text-center">Chưa có đăng ký nào</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

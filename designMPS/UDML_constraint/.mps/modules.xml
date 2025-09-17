@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MPSProject">
+    <projectModules>
+      <modulePath path="$PROJECT_DIR$/languages/ExtendBaseLanguage.sandbox/ExtendBaseLanguage.sandbox.msd" folder="ASolution" />
+      <modulePath path="$PROJECT_DIR$/languages/UDML.AGL/UDML.AGL.mpl" folder="DSLs" />
+      <modulePath path="$PROJECT_DIR$/languages/UDML.DCSL/UDML.DCSL.mpl" folder="DSLs" />
+      <modulePath path="$PROJECT_DIR$/languages/UDML.GUI/UDML.GUI.mpl" folder="DSLs" />
+      <modulePath path="$PROJECT_DIR$/languages/UDML.OCL/UDML.OCL.mpl" folder="DSLs" />
+      <modulePath path="$PROJECT_DIR$/languages/UDML.RBAC/UDML.RBAC.mpl" folder="DSLs" />
+      <modulePath path="$PROJECT_DIR$/languages/UDML.asDiagram/UDML.asDiagram.mpl" folder="Core" />
+      <modulePath path="$PROJECT_DIR$/languages/UDML.core/UDML.core.mpl" folder="Core" />
+      <modulePath path="$PROJECT_DIR$/languages/UDML.core/generator2/UDML.core.generator01.mpst" folder="Core" />
+      <modulePath path="$PROJECT_DIR$/solutions/UDML.Annotation/UDML.Annotation.msd" folder="Baselanguage" />
+      <modulePath path="$PROJECT_DIR$/solutions/UDML.diagram/UDML.diagram.msd" folder="Baselanguage" />
+      <modulePath path="$PROJECT_DIR$/solutions/UDML.sanbox/UDML.sanbox.msd" folder="ASanbox" />
+    </projectModules>
+  </component>
+</project>

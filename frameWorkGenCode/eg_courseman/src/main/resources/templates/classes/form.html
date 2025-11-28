@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: header}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <!-- Template Path Debugging -->
+        <div class="alert alert-info mb-4">
+            <strong>Template Path:</strong> templates/classes/form.html
+        </div>
+        
+        <h2 th:text="${sclass != null && sclass.id != null ? 'Edit Class' : 'Add New Class'}"></h2>
+        
+        <form th:action="@{/classes}" th:object="${sclass}" method="post">
+            <input type="hidden" th:if="${sclass != null}" th:field="*{id}" />
+            
+            <div class="mb-3">
+                <label for="name" class="form-label">Class Name</label>
+                <input type="text" class="form-control" id="name" th:field="*{name}" required>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a th:href="@{/classes}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+</body>
+</html>

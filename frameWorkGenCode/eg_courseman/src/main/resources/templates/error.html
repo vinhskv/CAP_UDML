@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: header}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container mt-5">
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error!</h4>
+            <p th:text="${errorMessage != null ? errorMessage : 'An error occurred. Please try again later.'}"></p>
+            <hr>
+            <p class="mb-0">
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">Go Back</a>
+                <a th:href="@{/}" class="btn btn-primary">Go to Home</a>
+            </p>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+</body>
+</html>

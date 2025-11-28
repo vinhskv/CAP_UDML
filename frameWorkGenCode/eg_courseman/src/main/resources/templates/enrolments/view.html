@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: header}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 th:text="${enrolment.id == null ? 'Add New Enrolment' : 'Edit Enrolment'}" class="mb-0"></h2>
+            </div>
+            <div class="card-body">
+                <!-- Global errors -->
+                <div class="alert alert-danger" th:if="${#fields.hasErrors('global')}" th:errors="*{global}"></div>
+                
+                <!-- Custom error message -->
+                <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+                
+                <form th:action="@{/enrolments}" th:object="${enrolment}" method="post">
+                    <input type="hidden" th:field="*{id}" />
+                    
+                    <div class="form-group">
+                        <label for="student" class="form-label">Student</label>
+                        <select class="form-control" id="student" th:field="*{student.id}" required
+                                th:classappend="${#fields.hasErrors('student')} ? 'is-invalid' : ''">
+                            <option value="">-- Select Student --</option>
+                            <option th:each="student : ${students}" 
+                                    th:value="${student.id}" 
+                                    th:text="${student.id + ' - ' + student.name}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('student')}" th:errors="*{student}"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="courseModule" class="form-label">Course Module</label>
+                        <select class="form-control" id="courseModule" th:field="*{courseModule.id}" required
+                                th:classappend="${#fields.hasErrors('courseModule')} ? 'is-invalid' : ''">
+                            <option value="">-- Select Course Module --</option>
+                            <option th:each="courseModule : ${courseModules}" 
+                                    th:value="${courseModule.id}" 
+                                    th:text="${courseModule.code + ' - ' + courseModule.name + ' (' + courseModule.credits + ' credits)'}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('courseModule')}" th:errors="*{courseModule}"></div>
+                        <small class="form-text text-muted">Note: Maximum 15 total credits allowed per student.</small>
+                    </div>
+                    
+                    <div class="alert alert-info" th:if="${enrolment.id == null}">
+                        <i class="fas fa-info-circle"></i> You can add grades after creating the enrolment.
+                    </div>
+                    
+                    <!-- Grade inputs if editing existing enrolment -->
+                    <div class="row" th:if="${enrolment.id != null}">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="internalMark" class="form-label">Internal Mark (0-10)</label>
+                                <input type="number" class="form-control" id="internalMark" th:field="*{internalMark}" 
+                                       min="0" max="10" step="0.1"
+                                       th:classappend="${#fields.hasErrors('internalMark')} ? 'is-invalid' : ''">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('internalMark')}" th:errors="*{internalMark}"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="examMark" class="form-label">Exam Mark (0-10)</label>
+                                <input type="number" class="form-control" id="examMark" th:field="*{examMark}" 
+                                       min="0" max="10" step="0.1"
+                                       th:classappend="${#fields.hasErrors('examMark')} ? 'is-invalid' : ''">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('examMark')}" th:errors="*{examMark}"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <div class="form-group">
+                                <label for="finalGrade" class="form-label">Final Grade (Calculated)</label>
+                                <input type="text" class="form-control" id="finalGrade" 
+                                       th:value="${enrolment.finalGrade != null ? #numbers.formatDecimal(enrolment.finalGrade, 1, 2) : 'Not calculated yet'}" 
+                                       readonly disabled>
+                                <small class="form-text text-muted">Final grade is calculated automatically as 70% exam mark + 30% internal mark.</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a th:href="@{/enrolments}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: header}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Enrolments</h2>
+            <a th:href="@{/enrolments/new}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Enrolment
+            </a>
+        </div>
+
+        <!-- Message Alerts -->
+        <div class="alert alert-success alert-dismissible fade show" th:if="${successMessage}" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        
+        <div class="alert alert-danger alert-dismissible fade show" th:if="${errorMessage}" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="alert alert-info" th:if="${enrolments.empty}">
+            No enrolments found. Please add a new enrolment.
+        </div>
+
+        <div class="table-responsive" th:if="${!enrolments.empty}">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Credits</th>
+                        <th>Internal Mark</th>
+                        <th>Exam Mark</th>
+                        <th>Final Grade</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="enrolment : ${enrolments}">
+                        <td th:text="${enrolment.id}"></td>
+                        <td>
+                            <a th:href="@{/students/view/{id}(id=${enrolment.student.id})}" 
+                               th:text="${enrolment.student.name}"></a>
+                        </td>
+                        <td th:text="${enrolment.courseModule.code + ' - ' + enrolment.courseModule.name}"></td>
+                        <td th:text="${enrolment.courseModule.credits}"></td>
+                        <td th:text="${enrolment.internalMark != null ? #numbers.formatDecimal(enrolment.internalMark, 1, 1) : 'N/A'}"></td>
+                        <td th:text="${enrolment.examMark != null ? #numbers.formatDecimal(enrolment.examMark, 1, 1) : 'N/A'}"></td>
+                        <td>
+                            <span th:if="${enrolment.finalGrade != null}" 
+                                  th:text="${#numbers.formatDecimal(enrolment.finalGrade, 1, 2)}"
+                                  th:class="${enrolment.finalGrade >= 5.0 ? 'text-success font-weight-bold' : 'text-danger'}">
+                            </span>
+                            <span th:unless="${enrolment.finalGrade != null}" class="text-muted">N/A</span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a th:href="@{/enrolments/edit/{id}(id=${enrolment.id})}" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a th:href="@{/enrolments/grades/{id}(id=${enrolment.id})}" class="btn btn-info">
+                                    <i class="fas fa-graduation-cap"></i> Grades
+                                </a>
+                                <a th:href="@{/enrolments/delete/{id}(id=${enrolment.id})}" 
+                                   class="btn btn-danger"
+                                   onclick="return confirm('Are you sure you want to delete this enrolment?')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    
+    <!-- JavaScript for auto-hide alert messages -->
+    <script>
+        // Auto-hide alert messages after 5 seconds
+        window.setTimeout(function() {
+            $(".alert-success, .alert-danger").fadeTo(500, 0).slideUp(500, function(){
+                $(this).remove(); 
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

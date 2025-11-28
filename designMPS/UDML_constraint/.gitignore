@@ -1,0 +1,11 @@
+# MPS generated
+classes_gen/
+source_gen/
+generator/source_gen/
+source_gen.caches/
+artifacts/
+out/
+build/
+tmp/
+.idea/**/workspace.xml
+.mps/workspace.xml

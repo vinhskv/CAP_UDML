@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: header}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 th:text="${enrolment.id == null ? 'Add New Enrolment' : 'Edit Enrolment'}" class="mb-0"></h2>
+            </div>
+            <div class="card-body">
+                <!-- Alert for error messages -->
+                <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+                
+                <form th:action="@{/enrolments}" th:object="${enrolment}" method="post">
+                    <input type="hidden" th:field="*{id}" />
+                    
+                    <div class="form-group">
+                        <label for="student" class="form-label">Student <span class="text-danger">*</span></label>
+                        <select class="form-control" id="student" name="student.id" required>
+                            <option value="">-- Select Student --</option>
+                            <option th:each="student : ${students}" 
+                                    th:value="${student.id}" 
+                                    th:text="${student.id + ' - ' + student.name}"
+                                    th:selected="${enrolment.student != null && enrolment.student.id == student.id}">
+                            </option>
+                        </select>
+                        <div class="text-danger" th:if="${#fields.hasErrors('student')}" th:errors="*{student}"></div>
+                    </div>
+                    
+                    <div class="form-group mt-3">
+                        <label for="courseModule" class="form-label">Course Module <span class="text-danger">*</span></label>
+                        <select class="form-control" id="courseModule" name="courseModule.id" required>
+                            <option value="">-- Select Course Module --</option>
+                            <option th:each="courseModule : ${courseModules}" 
+                                    th:value="${courseModule.id}" 
+                                    th:text="${courseModule.code + ' - ' + courseModule.name + ' (' + courseModule.credits + ' credits)'}"
+                                    th:selected="${enrolment.courseModule != null && enrolment.courseModule.id == courseModule.id}">
+                            </option>
+                        </select>
+                        <div class="text-danger" th:if="${#fields.hasErrors('courseModule')}" th:errors="*{courseModule}"></div>
+                        <small class="form-text text-muted">Note: Maximum 15 total credits allowed per student.</small>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3" th:if="${enrolment.id == null}">
+                        <i class="fas fa-info-circle"></i> You can add grades after creating the enrolment.
+                    </div>
+                    
+                    <!-- Grade inputs if editing existing enrolment -->
+                    <div class="row mt-3" th:if="${enrolment.id != null}">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="internalMark" class="form-label">Internal Mark (0-10)</label>
+                                <input type="number" class="form-control" id="internalMark" th:field="*{internalMark}" 
+                                       min="0" max="10" step="0.1">
+                                <div class="text-danger" th:if="${#fields.hasErrors('internalMark')}" th:errors="*{internalMark}"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="examMark" class="form-label">Exam Mark (0-10)</label>
+                                <input type="number" class="form-control" id="examMark" th:field="*{examMark}" 
+                                       min="0" max="10" step="0.1">
+                                <div class="text-danger" th:if="${#fields.hasErrors('examMark')}" th:errors="*{examMark}"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <div class="form-group">
+                                <label for="finalGrade" class="form-label">Final Grade (Calculated)</label>
+                                <input type="text" class="form-control" id="finalGrade" 
+                                       th:value="${enrolment.finalGrade != null ? #numbers.formatDecimal(enrolment.finalGrade, 1, 2) : 'Not calculated yet'}" 
+                                       readonly disabled>
+                                <small class="form-text text-muted">Final grade is calculated automatically as 70% exam mark + 30% internal mark.</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a th:href="@{/enrolments}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+    
+    <script>
+        // Highlight fields with errors
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorMessage = document.querySelector('.alert-danger');
+            if (errorMessage) {
+                window.scrollTo(0, 0);
+            }
+            
+            // Auto-calculate final grade when internal mark or exam mark changes
+            const internalMarkInput = document.getElementById('internalMark');
+            const examMarkInput = document.getElementById('examMark');
+            const finalGradeInput = document.getElementById('finalGrade');
+            
+            if (internalMarkInput && examMarkInput && finalGradeInput) {
+                const calculateFinalGrade = function() {
+                    const internalMark = parseFloat(internalMarkInput.value) || 0;
+                    const examMark = parseFloat(examMarkInput.value) || 0;
+                    
+                    if (internalMark >= 0 && examMark >= 0) {
+                        const finalGrade = (examMark * 0.7 + internalMark * 0.3).toFixed(2);
+                        finalGradeInput.value = finalGrade;
+                    } else {
+                        finalGradeInput.value = 'Not calculated yet';
+                    }
+                };
+                
+                internalMarkInput.addEventListener('input', calculateFinalGrade);
+                examMarkInput.addEventListener('input', calculateFinalGrade);
+            }
+        });
+    </script>
+</body>
+</html>

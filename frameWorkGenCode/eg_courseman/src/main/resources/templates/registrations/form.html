@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: header}"></head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <h2 th:text="${registration.id == null ? 'Add New Class Registration' : 'Edit Class Registration'}"></h2>
+        
+        <form th:action="@{/registrations}" th:object="${registration}" method="post">
+            <input type="hidden" th:field="*{id}" />
+            
+            <div class="mb-3">
+                <label for="student" class="form-label">Student</label>
+                <select class="form-select" id="student" th:field="*{student}" required>
+                    <option value="">-- Select Student --</option>
+                    <option th:each="student : ${students}"
+                            th:value="${student.id}"
+                            th:text="${student.name}"></option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="sclass" class="form-label">Class</label>
+                <select class="form-select" id="sclass" th:field="*{sclass}" required>
+                    <option value="">-- Select Class --</option>
+                    <option th:each="class : ${classes}"
+                            th:value="${class.id}"
+                            th:text="${class.name}"></option>
+                </select>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a th:href="@{/registrations}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <footer th:replace="~{layout :: footer}"></footer>
+</body>
+</html>

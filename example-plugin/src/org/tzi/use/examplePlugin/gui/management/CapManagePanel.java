@@ -36,7 +36,7 @@ import static org.tzi.use.examplePlugin.util.FileUtils.deleteCapFolder;
 import static org.tzi.use.examplePlugin.util.FileUtils.getCurrentCAP;
 import static org.tzi.use.examplePlugin.util.GUIUtils.setMaximumFrameSize;
 import static org.tzi.use.examplePlugin.util.GUIUtils.showErrorDialog;
-
+// test commit
 /**
  * Panel for managing CAP (read - update - delete) operations.
  */

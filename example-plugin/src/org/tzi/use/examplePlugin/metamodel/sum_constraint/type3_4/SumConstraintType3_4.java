@@ -11,12 +11,8 @@ public class SumConstraintType3_4 implements SumConstraintInterface {
   String assocCls;
   String rolePath;
   String sumAttr;
-  String fixAttr;
 
   public List<AttrCond> filters;
-
-  String groupAttr;
-  String groupKeyAttr;
 
   BoundType boundType;
   String boundValue;

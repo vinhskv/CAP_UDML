@@ -222,17 +222,21 @@
 package org.tzi.use.examplePlugin.gui.parser;
 
 import org.tzi.use.examplePlugin.ast.ASTInterface;
+import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintType;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintDetector;
 import org.tzi.use.examplePlugin.use.ASTToJSONConverter;
 import org.tzi.use.examplePlugin.util.ASTPrinter;
+import org.tzi.use.examplePlugin.util.CommonAttributes;
+import org.tzi.use.examplePlugin.util.ConstraintType;
 import org.tzi.use.examplePlugin.util.UseUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Map;
 
 public class CapPaserPanel extends JPanel {
 
@@ -380,7 +384,10 @@ public class CapPaserPanel extends JPanel {
       SumConstraintType type = detector.detectType(ast);
       typeLabel.setText("Type: " + type);
 
-      String ocl = SumConstraintExecutor.execute(
+      System.out.println("==============================");
+      System.out.println(ASTToJSONConverter.toJsonObject(ast));
+
+      String ocl = ConstraintExecutor(
           ast,
           ASTToJSONConverter.toJsonObject(ast),
           context,
@@ -444,5 +451,30 @@ public class CapPaserPanel extends JPanel {
         "Input Error",
         JOptionPane.WARNING_MESSAGE
     );
+  }
+
+  private String ConstraintExecutor(ASTInterface astInterface, Map<String, Object> astJson, String context, String name) {
+
+    String type = astJson.get(CommonAttributes.TYPE).toString();
+
+    if (type.equalsIgnoreCase(ConstraintType.SUM_CONSTRAINT)) {
+      return SumConstraintExecutor.execute(
+          astInterface,
+          ASTToJSONConverter.toJsonObject(astInterface),
+          context,
+          name
+      );
+    }
+
+    if (type.equalsIgnoreCase(ConstraintType.ELIGIBILITY_CONSTRAINT)) {
+      return EligibilityConstraintExecutor.execute(
+          astInterface,
+          ASTToJSONConverter.toJsonObject(astInterface),
+          context,
+          name
+      );
+    }
+
+    return null;
   }
 }

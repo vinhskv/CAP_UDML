@@ -3,5 +3,5 @@ public enum IfFixType {
   FIX_NUM,
   FIX_BOOL,
   FIX_ATTR,
-  FIX_STR
+  FIX_STR,
 }

@@ -34,10 +34,8 @@ public class SumConstraintType3_4Parser implements SumConstraintParser<SumConstr
     sc.sumAttr = (String) args.get(SUM_ATTR);
 
     // collect
-    System.out.println("Parsing collect part:");
     parseCollect(args, sc);
 
-    System.out.println("Parsing condition part:");
     // ifPart
     List<Map<String, Object>> ifPart =
         (List<Map<String, Object>>) args.get("ifPart");

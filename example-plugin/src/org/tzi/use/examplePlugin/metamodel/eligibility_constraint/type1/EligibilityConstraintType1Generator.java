@@ -2,9 +2,30 @@ package org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type1;
 
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintGenerator;
 
+import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildAllowedCondition;
+import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildIfCondition;
+
 public class EligibilityConstraintType1Generator implements EligibilityConstraintGenerator<EligibilityConstraintType1> {
   @Override
   public String generate(String contextClass, String invariantName, EligibilityConstraintType1 ec) {
-    return null;
+    System.out.println("Generating EligibilityConstraintType1...");
+    String ifCond = buildIfCondition(ec.ifParts);
+    String impliesPart = (ifCond == null) ? "" : ifCond + " implies\n  ";
+
+    String allowedCond = buildAllowedCondition(ec.filters);
+
+    return """
+        context %s
+        inv %s:
+          %sself.%s->forAll(e |
+            %s
+          )
+        """.formatted(
+        contextClass,
+        invariantName,
+        impliesPart,
+        ec.assocCls,
+        allowedCond
+    );
   }
 }

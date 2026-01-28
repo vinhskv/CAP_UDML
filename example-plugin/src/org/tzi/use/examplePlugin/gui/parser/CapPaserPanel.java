@@ -458,6 +458,7 @@ public class CapPaserPanel extends JPanel {
     String type = astJson.get(CommonAttributes.TYPE).toString();
 
     if (type.equalsIgnoreCase(ConstraintType.SUM_CONSTRAINT)) {
+      System.out.println("This is a Sum Constraint.");
       return SumConstraintExecutor.execute(
           astInterface,
           ASTToJSONConverter.toJsonObject(astInterface),
@@ -467,6 +468,7 @@ public class CapPaserPanel extends JPanel {
     }
 
     if (type.equalsIgnoreCase(ConstraintType.ELIGIBILITY_CONSTRAINT)) {
+      System.out.println("This is an Eligibility Constraint.");
       return EligibilityConstraintExecutor.execute(
           astInterface,
           ASTToJSONConverter.toJsonObject(astInterface),

@@ -9,4 +9,5 @@ public class CommonAttributes {
   public static final String COLLECT = "collect";
   public static final String ATTR = "attr";
   public static final String MATCH_ATTR = "matchAttr";
+  public static final String MAX = "max";
 }

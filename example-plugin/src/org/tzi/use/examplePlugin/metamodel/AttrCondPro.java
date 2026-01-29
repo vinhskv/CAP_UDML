@@ -7,11 +7,16 @@ public class AttrCondPro {
   public String matchAttr;
   public boolean neg;
   public Type type;
+  public String scale;
 
   public enum Type {
     MIN_LIM,
     MAX_LIM,
     FIX_BOOL,
-    FIX_NUM
+    FIX_NUM,
+    MIN_LIM_ATTR,
+    MAX_LIM_ATTR,
+    MIN,
+    MAX
   }
 }

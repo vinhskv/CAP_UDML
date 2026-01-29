@@ -31,7 +31,15 @@ public class ParserUtil {
           (Map<String, Object>) cond.get(ARGS);
 
       IfPart ip = new IfPart();
-      ip.ifAttr = asString(condArgs.get("attr"));
+      List<String> attrs = condArgs.entrySet().stream()
+          .filter(e -> e.getKey().startsWith("attr"))
+          .sorted(Map.Entry.comparingByKey())
+          .map(e -> asString(e.getValue()))
+          .toList();
+
+      if (!attrs.isEmpty()) {
+        ip.ifAttr = String.join(".", attrs);
+      }
 
       if (condArgs.containsKey("fixAttr")) {
         ip.ifFixType = IfFixType.FIX_ATTR;
@@ -47,7 +55,6 @@ public class ParserUtil {
         ip.ifFixValue = asString(condArgs.get("fixStr"));
       }
 
-      // nếu sau này AST có not / negated
       if (condArgs.containsKey("negated")) {
         ip.negated = Boolean.TRUE.equals(condArgs.get("negated"));
       }

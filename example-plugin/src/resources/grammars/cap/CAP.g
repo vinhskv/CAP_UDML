@@ -73,8 +73,14 @@ value returns [Object val]
     :
       s=STRING
         { $val = stripQuotes($s.getText()); }
-    | n=NUMBER
-        { $val = Integer.parseInt($n.getText()); }
+    | n=NUMBER {
+        String txt = $n.getText();
+        if (txt.contains(".")) {
+            $val = Double.parseDouble(txt);
+        } else {
+            $val = Integer.parseInt(txt);
+        }
+    }
     | q=QUALIFIED_IDENT
         { $val = $q.getText(); }
     | i=IDENT

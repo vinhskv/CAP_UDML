@@ -3,11 +3,20 @@ package org.tzi.use.examplePlugin.util;
 import org.tzi.use.examplePlugin.metamodel.AttrCond;
 import org.tzi.use.examplePlugin.metamodel.AttrCondPro;
 import org.tzi.use.examplePlugin.metamodel.IfPart;
+import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.RootScope;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class GeneratorUtils {
+
+  /**
+   * If parts to condition string
+   *
+   * @param ifParts
+   * @return
+   */
   public static String buildIfCondition(List<IfPart> ifParts) {
 
     if (ifParts == null || ifParts.isEmpty()) {
@@ -31,24 +40,52 @@ public class GeneratorUtils {
   }
 
 
-  public static String buildAllowedCondition(List<AttrCondPro> filters) {
-    return filters.stream()
-        .map(GeneratorUtils::buildSingleAllowedCondition)
+  public static String buildAllowedCondition(
+      List<AttrCondPro> filters,
+      RootScope scope
+  ) {
+    int lastIndex = filters.size() - 1;
+
+    return IntStream.range(0, filters.size())
+        .mapToObj(i -> buildSingleAllowedCondition(
+            filters.get(i),
+            scope,
+            i == lastIndex
+        ))
         .collect(Collectors.joining(" and "));
   }
 
-  private static String buildSingleAllowedCondition(AttrCondPro c) {
+  private static String buildSingleAllowedCondition(
+      AttrCondPro c,
+      RootScope scope,
+      boolean isLast
+  ) {
 
-    // e.course.level
-    String path = "e." + String.join(".", c.attrs);
+    String root;
+    if (scope == RootScope.ALL) {
+      root = "self";
+    } else if (scope == RootScope.LAST_ONLY && isLast) {
+      root = "self";
+    } else {
+      root = "e";
+    }
+
+    String right ="";
+    if (c.scale != null && !c.scale.isEmpty()) {
+      right = c.scale + " * " + root + "." + c.attrs.get(0) + "." + c.matchAttr;
+    } else {
+      right = root + "." + c.matchAttr;
+    }
+
+    String path = root + "." + String.join(".", c.attrs);
 
     String cond;
     switch (c.type) {
-      case MIN_LIM ->
-          cond = path + " < " + c.matchAttr;
+      case MIN_LIM, MIN_LIM_ATTR, MIN ->
+          cond = path + " < " + right;
 
-      case MAX_LIM ->
-          cond = path + " > " + c.matchAttr;
+      case MAX_LIM, MAX_LIM_ATTR, MAX ->
+          cond = path + " > " + right;
 
       case FIX_BOOL ->
           cond = Boolean.parseBoolean(c.matchAttr.toString())

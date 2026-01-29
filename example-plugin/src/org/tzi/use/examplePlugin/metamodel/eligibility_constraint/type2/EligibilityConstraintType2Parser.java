@@ -1,4 +1,4 @@
-package org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type1;
+package org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type2;
 
 import org.tzi.use.examplePlugin.metamodel.AttrCondPro;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintParser;
@@ -10,50 +10,42 @@ import java.util.Map;
 
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ARGS;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ASSOC_CLS;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.COLLECT;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.MAX;
+import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CHECK_FOR_EXI;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ROLE_PATH;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.SUM_ATTR;
-import static org.tzi.use.examplePlugin.util.UseUtils.asString;
 
-public class EligibilityConstraintType1Parser implements EligibilityConstraintParser<EligibilityConstraintType1> {
+public class EligibilityConstraintType2Parser implements EligibilityConstraintParser<EligibilityConstraintType2> {
+
   @Override
-  public EligibilityConstraintType1 parse(Map<String, Object> astJson) {
-    EligibilityConstraintType1 ec1 = new EligibilityConstraintType1();
+  public EligibilityConstraintType2 parse(Map<String, Object> astJson) {
+    EligibilityConstraintType2 ec2 = new EligibilityConstraintType2();
+    System.out.println("Parsing EligibilityConstraintType2...");
 
-    System.out.println("Parsing EligibilityConstraintType1...");
-    // ---- root args ----
     Map<String, Object> args = (Map<String, Object>) astJson.get(ARGS);
-    ec1.assocCls = (String) args.get(ASSOC_CLS);
-    ec1.rolePath = (String) args.get(ROLE_PATH);
+    ec2.assocCls = (String) args.get(ASSOC_CLS);
+    ec2.rolePath = (String) args.get(ROLE_PATH);
 
-    System.out.println("Parsing sum part:");
-    ec1.sumAttr = asString(args.get(SUM_ATTR));
-    ec1.max = Integer.parseInt(asString(args.get(MAX)));
+    // if parts
+    ec2.ifParts = ParserUtil.parseIfPart(astJson);
 
-    // collect
-    System.out.println("Parsing collect part:");
-    parseCollect(args, ec1);
-
-    ec1.ifParts = ParserUtil.parseIfPart(astJson);
-
-
-    return ec1;
+    // check for existence parts
+    System.out.println("Parsing check for existence part:");
+    parseCheckForExi(args, ec2);
+    return ec2;
   }
 
-  private static void parseCollect(
+  private static void parseCheckForExi(
       Map<String, Object> args,
-      EligibilityConstraintType1 ec1
+      EligibilityConstraintType2 ec2
   ) {
 
-    List<Map<String, Object>> collect =
-        (List<Map<String, Object>>) args.get(COLLECT);
+    List<Map<String, Object>> checkForExi =
+        (List<Map<String, Object>>) args.get(CHECK_FOR_EXI);
 
-    if (collect == null || collect.isEmpty()) return;
+    if (checkForExi == null || checkForExi.isEmpty()) return;
 
     List<AttrCondPro> attrConds = new ArrayList<>();
 
-    for (Map<String, Object> attrCond : collect) {
+    for (Map<String, Object> attrCond : checkForExi) {
 
       Map<String, Object> condArgs =
           (Map<String, Object>) attrCond.get(ARGS);
@@ -67,14 +59,13 @@ public class EligibilityConstraintType1Parser implements EligibilityConstraintPa
       if (condArgs.containsKey("minLim")) {
         c.type = AttrCondPro.Type.MIN_LIM;
         c.matchAttr = String.valueOf(condArgs.get("minLim"));
-      }
-      else if (condArgs.containsKey("maxLim")) {
+      } else if (condArgs.containsKey("maxLim")) {
         c.type = AttrCondPro.Type.MAX_LIM;
         c.matchAttr = String.valueOf(condArgs.get("maxLim"));
       } else if (condArgs.containsKey("fixBool")) {
         c.type = AttrCondPro.Type.FIX_BOOL;
         c.matchAttr = String.valueOf(condArgs.get("fixBool"));
-      } else if(condArgs.containsKey("fixNum")) {
+      } else if (condArgs.containsKey("fixNum")) {
         c.type = AttrCondPro.Type.FIX_NUM;
         c.matchAttr = String.valueOf(condArgs.get("fixNum"));
       } else if (condArgs.containsKey("minLimAttr")) {
@@ -94,6 +85,6 @@ public class EligibilityConstraintType1Parser implements EligibilityConstraintPa
       attrConds.add(c);
     }
 
-    ec1.filters = attrConds;
+    ec2.checkForExi = attrConds;
   }
 }

@@ -10,4 +10,10 @@ public class CommonAttributes {
   public static final String ATTR = "attr";
   public static final String MATCH_ATTR = "matchAttr";
   public static final String MAX = "max";
+
+  // eligibility constraint specific
+  public static final String CHECK_FOR_EXI = "checkForExi";
+  public static final String SCALE = "scale";
+  public static final String RATIO = "ratio";
+
 }

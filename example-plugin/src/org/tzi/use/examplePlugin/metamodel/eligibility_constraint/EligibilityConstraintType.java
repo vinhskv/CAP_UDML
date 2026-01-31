@@ -6,13 +6,17 @@ import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type2.Eligibil
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type2.EligibilityConstraintType2Parser;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type3.EligibilityConstraintType3Generator;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type3.EligibilityConstraintType3Parser;
+import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type4.EligibilityConstraintType4Generator;
+import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type4.EligibilityConstraintType4Parser;
+import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type5.EligibilityConstraintType5Generator;
+import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type5.EligibilityConstraintType5Parser;
 
 public enum EligibilityConstraintType {
   TYPE1(new EligibilityConstraintType1Parser(), new EligibilityConstraintType1Generator()),
   TYPE2(new EligibilityConstraintType2Parser(), new EligibilityConstraintType2Generator()),
   TYPE3(new EligibilityConstraintType3Parser(), new EligibilityConstraintType3Generator()),
-  TYPE4(null, null),
-  TYPE5(null, null),
+  TYPE4(new EligibilityConstraintType4Parser(), new EligibilityConstraintType4Generator()),
+  TYPE5(new EligibilityConstraintType5Parser(), new EligibilityConstraintType5Generator()),
   UNSUPPORTED(null, null);
 
   public final EligibilityConstraintParser<?> parser;

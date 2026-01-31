@@ -8,6 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ARGS;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_ATTR;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_BOOL;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_ENUM;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_NUM;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_STR;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX_LIM;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX_VALUE;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MIN;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MIN_LIM;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MIN_VALUE;
 import static org.tzi.use.examplePlugin.util.UseUtils.asString;
 
 public class ParserUtil {
@@ -41,18 +52,33 @@ public class ParserUtil {
         ip.ifAttr = String.join(".", attrs);
       }
 
-      if (condArgs.containsKey("fixAttr")) {
+      if (condArgs.containsKey(FIX_ATTR)) {
         ip.ifFixType = IfFixType.FIX_ATTR;
-        ip.ifFixValue = asString(condArgs.get("fixAttr"));
-      } else if (condArgs.containsKey("fixNum")) {
+        ip.ifFixValue = asString(condArgs.get(FIX_ATTR));
+      } else if (condArgs.containsKey(FIX_NUM)) {
         ip.ifFixType = IfFixType.FIX_NUM;
-        ip.ifFixValue = asString(condArgs.get("fixNum"));
-      } else if (condArgs.containsKey("fixBool")) {
+        ip.ifFixValue = asString(condArgs.get(FIX_NUM));
+      } else if (condArgs.containsKey(FIX_BOOL)) {
         ip.ifFixType = IfFixType.FIX_BOOL;
-        ip.ifFixValue = asString(condArgs.get("fixBool"));
-      } else if (condArgs.containsKey("fixStr")) {
+        ip.ifFixValue = asString(condArgs.get(FIX_BOOL));
+      } else if (condArgs.containsKey(FIX_STR)) {
         ip.ifFixType = IfFixType.FIX_STR;
-        ip.ifFixValue = asString(condArgs.get("fixStr"));
+        ip.ifFixValue = asString(condArgs.get(FIX_STR));
+      } else if (condArgs.containsKey(FIX_ENUM)) {
+        ip.ifFixType = IfFixType.FIX_ENUM;
+        ip.ifFixValue = asString(condArgs.get(FIX_ENUM));
+      } else if (condArgs.containsKey(MAX_LIM)) {
+        ip.ifFixType = IfFixType.MAX_VALUE;
+        ip.ifFixValue = asString(condArgs.get(MAX_LIM));
+      } else if (condArgs.containsKey(MIN_LIM)) {
+        ip.ifFixType = IfFixType.MIN_VALUE;
+        ip.ifFixValue = asString(condArgs.get(MAX_LIM));
+      } else if (condArgs.containsKey(MAX_VALUE)) {
+        ip.ifFixType = IfFixType.MAX_LIM;
+        ip.ifFixValue = asString(condArgs.get(MAX_VALUE));
+      } else if (condArgs.containsKey(MIN_VALUE)) {
+        ip.ifFixType = IfFixType.MIN_LIM;
+        ip.ifFixValue = asString(condArgs.get(MIN_VALUE));
       }
 
       if (condArgs.containsKey("negated")) {
@@ -66,6 +92,7 @@ public class ParserUtil {
   }
 
   public static List<String> parseAttrsFromCondArgs(Map<String, Object> condArgs) {
+    System.out.println("Parsing attrs from condArgs: " + condArgs);
     List<String> attrs = new ArrayList<>();
 
     if (condArgs.containsKey("attr")) {

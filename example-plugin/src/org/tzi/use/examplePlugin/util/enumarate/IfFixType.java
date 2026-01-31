@@ -4,4 +4,11 @@ public enum IfFixType {
   FIX_BOOL,
   FIX_ATTR,
   FIX_STR,
+  FIX_ENUM,
+  MIN_VALUE,
+  MAX_VALUE,
+  MIN_LIM,
+  MAX_LIM,
+  MIN_LIM_ATTR,
+  MAX_LIM_ATTR
 }

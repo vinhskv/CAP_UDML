@@ -17,6 +17,8 @@ public class AttrCondPro {
     MIN_LIM_ATTR,
     MAX_LIM_ATTR,
     MIN,
-    MAX
+    MAX,
+    MATCH_STR,
+    FIX_ENUM
   }
 }

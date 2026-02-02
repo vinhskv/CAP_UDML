@@ -10,7 +10,7 @@ public class EligibilityConstraintType3Generator implements EligibilityConstrain
   @Override
   public String generate(String contextClass, String invariantName, EligibilityConstraintType3 ec) {
     System.out.println("Generating EligibilityConstraintType3...");
-    String ifCond = buildIfCondition(ec.ifParts);
+    String ifCond = buildIfCondition(ec.ifParts, null);
     String impliesPart = (ifCond == null) ? "" : ifCond + " implies\n  ";
 
     String checkForExi = buildAllowedCondition(ec.checkForExi, RootScope.ALL);

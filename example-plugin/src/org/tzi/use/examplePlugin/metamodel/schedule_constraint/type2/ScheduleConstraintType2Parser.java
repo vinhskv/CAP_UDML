@@ -1,58 +1,70 @@
-package org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type4;
+package org.tzi.use.examplePlugin.metamodel.schedule_constraint.type2;
 
 import org.tzi.use.examplePlugin.metamodel.AttrCondPro;
-import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintParser;
+import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintParser;
 import org.tzi.use.examplePlugin.util.ParserUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ALT_PART;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ARGS;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ASSOC_CLS;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CHECK_FOR_EXI;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.MIN;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.RATIO;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ROLE_PATH;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.SCALE;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.TARGET_ASSOC;
-import static org.tzi.use.examplePlugin.util.UseUtils.asString;
 
-public class EligibilityConstraintType4Parser implements EligibilityConstraintParser<EligibilityConstraintType4> {
+public class ScheduleConstraintType2Parser implements ScheduleConstraintParser<ScheduleConstraintType2> {
+
   @Override
-  public EligibilityConstraintType4 parse(Map<String, Object> astJson) {
-    EligibilityConstraintType4 ec4 = new EligibilityConstraintType4();
+  public ScheduleConstraintType2 parse(Map<String, Object> astJson) {
+    ScheduleConstraintType2 sc2 = new ScheduleConstraintType2();
 
-    System.out.println("Parsing EligibilityConstraintType4...");
+    System.out.println("Parsing ScheduleConstraintType2...");
+
     // ---- root args ----
     Map<String, Object> args = (Map<String, Object>) astJson.get(ARGS);
-    ec4.assocCls = (String) args.get(ASSOC_CLS);
-    ec4.rolePath = (String) args.get(ROLE_PATH);
-    ec4.targetAssoc = (String) args.get(TARGET_ASSOC);
-
-    ec4.min = Integer.parseInt(asString(args.get(MIN)));
+    sc2.assocCls = (String) args.get(ASSOC_CLS);
+    sc2.rolePath = (String) args.get(ROLE_PATH);
+    sc2.targetAssoc = (String) args.get(TARGET_ASSOC);
 
     // if parts
-    ec4.ifParts = ParserUtil.parseIfPart(astJson);
+    sc2.ifParts = ParserUtil.parseIfPart(astJson);
 
-    parseCheckForExi(args, ec4);
+    // check for exi parts
+    parseAttrCondProFromAttr(args, sc2, CHECK_FOR_EXI);
+    parseAttrCondProFromAttr(args, sc2, ALT_PART);
 
-    return ec4;
+    return sc2;
   }
 
-  private static void parseCheckForExi(
+  /**
+   * Parse the list of AttrCondPro from the specific attribute
+   * There are 2 cases for this
+   * - CHECK_FOR_EXI
+   * - ALT_PARTS
+   * @param args
+   * @param sc2
+   */
+  private static void parseAttrCondProFromAttr(
       Map<String, Object> args,
-      EligibilityConstraintType4 ec4
+      ScheduleConstraintType2 sc2,
+      String key
   ) {
 
-    List<Map<String, Object>> checkForExi =
-        (List<Map<String, Object>>) args.get(CHECK_FOR_EXI);
+    if (!key.equalsIgnoreCase(CHECK_FOR_EXI) && !key.equalsIgnoreCase(ALT_PART)) {
+      throw new IllegalArgumentException("Unsupported key for parsing AttrCondPro: " + key);
+    }
 
-    if (checkForExi == null || checkForExi.isEmpty()) return;
+    List<Map<String, Object>> listOfAttrCondPro =
+        (List<Map<String, Object>>) args.get(key);
+
+    if (listOfAttrCondPro == null || listOfAttrCondPro.isEmpty()) return;
 
     List<AttrCondPro> attrConds = new ArrayList<>();
 
-    for (Map<String, Object> attrCond : checkForExi) {
+    for (Map<String, Object> attrCond : listOfAttrCondPro) {
 
       Map<String, Object> condArgs =
           (Map<String, Object>) attrCond.get(ARGS);
@@ -62,17 +74,6 @@ public class EligibilityConstraintType4Parser implements EligibilityConstraintPa
       AttrCondPro c = new AttrCondPro();
       c.attrs = ParserUtil.parseAttrsFromCondArgs(condArgs);
       c.neg = Boolean.TRUE.equals(condArgs.get("neg"));
-
-      Object scaleObj = condArgs.get(SCALE);
-      Object ratioObj = condArgs.get(RATIO);
-
-      if (scaleObj != null) {
-        c.scale = scaleObj.toString();
-      } else if (ratioObj != null) {
-        c.scale = ratioObj.toString();
-      } else {
-        c.scale = null;
-      }
 
       if (condArgs.containsKey("minLim")) {
         c.type = AttrCondPro.Type.MIN_LIM;
@@ -98,10 +99,19 @@ public class EligibilityConstraintType4Parser implements EligibilityConstraintPa
       } else if (condArgs.containsKey("max")) {
         c.type = AttrCondPro.Type.MAX;
         c.matchAttr = String.valueOf(condArgs.get("max"));
+      } else if (condArgs.containsKey("fixEnum")) {
+        c.type = AttrCondPro.Type.FIX_ENUM;
+        c.matchAttr = String.valueOf(condArgs.get("fixEnum"));
       }
+
       attrConds.add(c);
     }
 
-    ec4.checkForExi = attrConds;
+    if (key.equalsIgnoreCase(CHECK_FOR_EXI)) {
+      sc2.checkForExi = attrConds;
+    } else if (key.equalsIgnoreCase(ALT_PART)) {
+      sc2.altParts = attrConds;
+    }
   }
+
 }

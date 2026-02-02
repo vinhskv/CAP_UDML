@@ -34,4 +34,14 @@ public class UseUtils {
   public static String asString(Object o) {
     return o == null ? null : String.valueOf(o);
   }
+
+  /**
+   * Check for has specific key in args
+   * @param astInterface
+   * @param key
+   * @return
+   */
+  public static boolean hasSpecificKey(ASTInterface astInterface, String key) {
+    return astInterface.args.get(key) != null;
+  }
 }

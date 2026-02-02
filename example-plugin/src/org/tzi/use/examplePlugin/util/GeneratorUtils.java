@@ -16,20 +16,25 @@ public class GeneratorUtils {
    * @param ifParts
    * @return
    */
-  public static String buildIfCondition(List<IfPart> ifParts) {
+  public static String buildIfCondition(List<IfPart> ifParts, String rootPrefix) {
 
     if (ifParts == null || ifParts.isEmpty()) {
       return null;
     }
 
+    String resolvedRoot =
+        (rootPrefix == null || rootPrefix.isEmpty())
+            ? "self"
+            : rootPrefix;
+
     return ifParts.stream()
         .map(c -> {
           String cond;
           switch (c.ifFixType) {
-            case FIX_NUM, FIX_BOOL, FIX_ATTR -> cond = "self." + c.ifAttr + " = " + c.ifFixValue;
-            case FIX_STR, FIX_ENUM -> cond = "self." + c.ifAttr + " = '" + c.ifFixValue + "'";
-            case MAX_LIM -> cond = "self." + c.ifAttr + " <= " + c.ifFixValue;
-            case MIN_LIM -> cond = "self." + c.ifAttr + " >= " + c.ifFixValue;
+            case FIX_NUM, FIX_BOOL, FIX_ATTR -> cond = resolvedRoot + "." + c.ifAttr + " = " + c.ifFixValue;
+            case FIX_STR, FIX_ENUM -> cond = resolvedRoot + "." + c.ifAttr + " = '" + c.ifFixValue + "'";
+            case MAX_LIM -> cond = resolvedRoot + "." + c.ifAttr + " <= " + c.ifFixValue;
+            case MIN_LIM -> cond = resolvedRoot + "." + c.ifAttr + " >= " + c.ifFixValue;
 
             default -> throw new RuntimeException("Invalid ifPart");
           }
@@ -38,12 +43,21 @@ public class GeneratorUtils {
         .collect(Collectors.joining(" and "));
   }
 
-
+  /**
+   * Builds an OCL condition string from the given attribute conditions.
+   * E.g: self.course.credits > 5 and self.course.isThesis = true
+   * join with "and"
+   * @param filters
+   * @param scope
+   * @return
+   */
   public static String buildAllowedCondition(
       List<AttrCondPro> filters,
       RootScope scope
   ) {
+    System.out.println("Building allowed condition for filters: " + filters + " with scope: " + scope);
     int lastIndex = filters.size() - 1;
+    System.out.println("Last index: " + lastIndex);
 
     return IntStream.range(0, filters.size())
         .mapToObj(i -> buildSingleAllowedCondition(
@@ -52,6 +66,32 @@ public class GeneratorUtils {
             i == lastIndex
         ))
         .collect(Collectors.joining(" and "));
+  }
+
+  /**
+   * Builds an OCL condition string from the given attribute conditions.
+   * E.g: self.course.credits > 5 and self.course.isThesis = true
+   * join with "or"
+   * @param filters
+   * @param scope
+   * @return
+   */
+  public static String buildAllowedOrCondition(
+      List<AttrCondPro> filters,
+      RootScope scope
+  ) {
+    System.out.println("Building allowed condition for filters: " + filters + " with scope: " + scope);
+    int lastIndex = filters.size() - 1;
+    System.out.println("Last index: " + lastIndex);
+
+
+    return IntStream.range(0, filters.size())
+        .mapToObj(i -> buildSingleAllowedCondition(
+            filters.get(i),
+            scope,
+            i == lastIndex
+        ))
+        .collect(Collectors.joining(" or "));
   }
 
   private static String buildSingleAllowedCondition(
@@ -88,6 +128,8 @@ public class GeneratorUtils {
           ? path
           : "not " + path;
 
+      case MATCH_STR, FIX_ENUM -> cond = path + " = '" + c.matchAttr + "'";
+
       default -> throw new RuntimeException("Unsupported AttrCondPro type: " + c.type);
     }
 
@@ -97,9 +139,7 @@ public class GeneratorUtils {
 
   /**
    * Builds an OCL exists condition for the given collection and attribute conditions.
-   * self.enrolments->exists(e
-   * | e.course.isThesis)
-   *
+   * self.enrolments->exists(e | e.course.isThesis and e.course.credits > 5)
    * @param collection
    * @param conds
    * @return
@@ -190,5 +230,15 @@ public class GeneratorUtils {
       prefix = prefix.trim() + ".";
     }
     return prefix != null ? prefix + String.join(".", attrs) : String.join(".", attrs);
+  }
+
+
+  public static String indent(String s, int spaces) {
+    if (s == null || s.isBlank()) return s;
+
+    String pad = " ".repeat(spaces);
+    return s.lines()
+        .map(line -> pad + line)
+        .collect(Collectors.joining("\n"));
   }
 }

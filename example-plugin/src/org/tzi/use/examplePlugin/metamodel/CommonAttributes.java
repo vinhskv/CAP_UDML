@@ -19,4 +19,9 @@ public class CommonAttributes {
   public static final String TARGET_ASSOC = "targetAssoc";
   public static final String MATCH_COLL = "matchColl";
 
+  // schedule constraint specific
+  public static final String CROSS_REFERENCE = "crossReference";
+  public static final String CONFLICT_CHECK = "conflictCheck";
+  public static final String INTERSECTION_OP = "intersectionOp";
+  public static final String ALT_PART = "altPart";
 }

@@ -10,7 +10,7 @@ public class EligibilityConstraintType1Generator implements EligibilityConstrain
   @Override
   public String generate(String contextClass, String invariantName, EligibilityConstraintType1 ec) {
     System.out.println("Generating EligibilityConstraintType1...");
-    String ifCond = buildIfCondition(ec.ifParts);
+    String ifCond = buildIfCondition(ec.ifParts, null);
     String impliesPart = (ifCond == null) ? "" : ifCond + " implies\n  ";
 
     String allowedCond = buildAllowedCondition(ec.filters, RootScope.LAST_ONLY);

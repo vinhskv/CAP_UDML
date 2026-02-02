@@ -223,6 +223,7 @@ package org.tzi.use.examplePlugin.gui.parser;
 
 import org.tzi.use.examplePlugin.ast.ASTInterface;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintExecutor;
+import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintType;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintDetector;
@@ -457,6 +458,7 @@ public class CapPaserPanel extends JPanel {
 
     String type = astJson.get(CommonAttributes.TYPE).toString();
 
+    // Sum Constraint
     if (type.equalsIgnoreCase(ConstraintType.SUM_CONSTRAINT)) {
       System.out.println("This is a Sum Constraint.");
       return SumConstraintExecutor.execute(
@@ -467,9 +469,21 @@ public class CapPaserPanel extends JPanel {
       );
     }
 
+    // Eligibility Constraint
     if (type.equalsIgnoreCase(ConstraintType.ELIGIBILITY_CONSTRAINT)) {
       System.out.println("This is an Eligibility Constraint.");
       return EligibilityConstraintExecutor.execute(
+          astInterface,
+          ASTToJSONConverter.toJsonObject(astInterface),
+          context,
+          name
+      );
+    }
+
+    // Schedule Constraint
+    if (type.equalsIgnoreCase(ConstraintType.SCHEDULE_CONSTRAINT)) {
+      System.out.println("This is a Schedule Constraint.");
+      return ScheduleConstraintExecutor.execute(
           astInterface,
           ASTToJSONConverter.toJsonObject(astInterface),
           context,

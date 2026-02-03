@@ -3,8 +3,10 @@ package org.tzi.use.examplePlugin.metamodel.schedule_constraint.type2;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.RootScope;
 import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintGenerator;
 
+import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.AND;
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildAllowedOrCondition;
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildExistsCheckCondition;
+import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildExistsCheckConditionEach;
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildIfCondition;
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.indent;
 
@@ -12,8 +14,8 @@ public class ScheduleConstraintType2Generator implements ScheduleConstraintGener
   @Override
   public String generate(String contextClass, String invariantName, ScheduleConstraintType2 sc2) {
     String ifCond = buildIfCondition(sc2.ifParts, "iter");
-    String checkForExi = buildExistsCheckCondition(sc2.rolePath, sc2.checkForExi);
-    String altPart = buildAllowedOrCondition(sc2.altParts, RootScope.NONE);
+    String checkForExi = buildExistsCheckConditionEach(sc2.rolePath, sc2.checkForExi, AND);
+    String altPart = buildAllowedOrCondition(sc2.altParts, RootScope.ALL);
     String iter = "iter";
 
     String body;

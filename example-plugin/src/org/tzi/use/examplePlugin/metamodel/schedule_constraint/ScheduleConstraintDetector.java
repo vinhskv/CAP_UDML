@@ -8,6 +8,7 @@ import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CONFLICT_CHEC
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CROSS_REFERENCE;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.INTERSECTION_OP;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.MAX;
+import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.WINDOW;
 import static org.tzi.use.examplePlugin.util.UseUtils.hasSpecificKey;
 
 public class ScheduleConstraintDetector {
@@ -19,6 +20,8 @@ public class ScheduleConstraintDetector {
       return ScheduleConstraintType.TYPE1;
     } else if (hasSpecificKey(astInterface, CHECK_FOR_EXI) && hasSpecificKey(astInterface, ALT_PART)) {
       return ScheduleConstraintType.TYPE2;
+    } else if (hasSpecificKey(astInterface, WINDOW)) {
+      return ScheduleConstraintType.TYPE3;
     }
     // Placeholder implementation
     return ScheduleConstraintType.UNSUPPORTED;

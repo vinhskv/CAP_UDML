@@ -4,13 +4,14 @@ import org.tzi.use.examplePlugin.metamodel.schedule_constraint.type1.ScheduleCon
 import org.tzi.use.examplePlugin.metamodel.schedule_constraint.type1.ScheduleConstraintType1Parser;
 import org.tzi.use.examplePlugin.metamodel.schedule_constraint.type2.ScheduleConstraintType2Generator;
 import org.tzi.use.examplePlugin.metamodel.schedule_constraint.type2.ScheduleConstraintType2Parser;
+import org.tzi.use.examplePlugin.metamodel.schedule_constraint.type3.ScheduleConstraintType3Generator;
+import org.tzi.use.examplePlugin.metamodel.schedule_constraint.type3.ScheduleConstraintType3Parser;
 
 public enum ScheduleConstraintType {
   TYPE1(new ScheduleConstraintType1Parser(), new ScheduleConstraintType1Generator()),
   TYPE2(new ScheduleConstraintType2Parser(), new ScheduleConstraintType2Generator()),
-  TYPE3(null, null),
+  TYPE3(new ScheduleConstraintType3Parser(), new ScheduleConstraintType3Generator()),
   TYPE4(null, null),
-  TYPE5(null, null),
   UNSUPPORTED(null, null);
 
   public final ScheduleConstraintParser<?> parser;

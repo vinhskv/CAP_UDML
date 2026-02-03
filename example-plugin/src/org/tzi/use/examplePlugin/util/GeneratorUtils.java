@@ -156,6 +156,31 @@ public class GeneratorUtils {
     return "self." + collection + "->exists(e | " + body + ")";
   }
 
+  /**
+   * Builds an OCL exists condition for the given collection and attribute conditions.
+   * self.enrolments->exists(e | e.course.isThesis) and self.enrolments->exists(e | e.course.credits > 5)
+   * @param collection
+   * @param conds
+   * @param joinOp
+   * @return
+   */
+  public static String buildExistsCheckConditionEach(
+      String collection,
+      List<AttrCondPro> conds,
+      String joinOp
+  ) {
+    if (conds == null || conds.isEmpty()) {
+      return "true";
+    }
+
+    return conds.stream()
+        .map(c -> {
+          String cond = buildSingleAllowedCondition(c, RootScope.NONE, true);
+          return "self." + collection + "->exists(e | " + cond + ")";
+        })
+        .collect(Collectors.joining(" " + joinOp + " "));
+  }
+
 
   /**
    * Builds an OCL exists condition for the given collection and attribute conditions.

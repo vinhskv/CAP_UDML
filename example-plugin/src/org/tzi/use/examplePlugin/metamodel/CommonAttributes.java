@@ -1,6 +1,10 @@
 package org.tzi.use.examplePlugin.metamodel;
 
 public class CommonAttributes {
+  // Joining attributes
+  public static final String AND = "and";
+  public static final String OR = "or";
+
   public static final String ARGS = "args";
   public static final String ASSOC_CLS = "assocCls";
   public static final String ROLE_PATH = "rolePath";
@@ -24,4 +28,5 @@ public class CommonAttributes {
   public static final String CONFLICT_CHECK = "conflictCheck";
   public static final String INTERSECTION_OP = "intersectionOp";
   public static final String ALT_PART = "altPart";
+  public static final String WINDOW = "window";
 }

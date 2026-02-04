@@ -29,4 +29,8 @@ public class CommonAttributes {
   public static final String INTERSECTION_OP = "intersectionOp";
   public static final String ALT_PART = "altPart";
   public static final String WINDOW = "window";
+  public static final String TIME_ATTR = "timeAttr";
+  public static final String BASE_TIME = "baseTime";
+  public static final String DURATION = "duration";
+  public static final String UNIT = "unit";
 }

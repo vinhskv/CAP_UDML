@@ -15,23 +15,26 @@ public class ScheduleConstraintType3Generator implements ScheduleConstraintGener
   public String generate(String contextClass, String invariantName, ScheduleConstraintType3 sc3) {
     System.out.println("Generating ScheduleConstraintType3...");
 
-    String rolePath = sc3.rolePath;
-    System.out.println("Role Path: " + rolePath);
-    String timeAttr = sc3.window.timeAttr;
-    System.out.println("Time Attribute: " + timeAttr);
-    String baseTime = sc3.window.baseTime;
-    System.out.println("Base Time: " + baseTime);
-    String unit = sc3.window.unit;
-    System.out.println("Unit: " + unit);
-    String duration = sc3.window.duration.toString();
-    System.out.println("Duration: " + duration);
-
-    OperatorEnum operatorEnum = sc3.limitAttribute.operator;
-    String operator = operatorEnum.symbol;
-    System.out.println("Operator: " + operator);
-    String value = sc3.limitAttribute.value;
-    System.out.println("Value: " + value);
-
-    return null;
+    return """
+        context %s
+        inv %s:
+          self.%s->select(e |
+            e.%s.isDefined() and
+            e.%s >= self.%s and
+            e.%s <= self.%s + %s
+          )->size() %s %s
+        """.formatted(
+        contextClass,
+        invariantName,
+        sc3.rolePath,
+        sc3.window.timeAttr,
+        sc3.window.timeAttr,
+        sc3.window.baseTime,
+        sc3.window.timeAttr,
+        sc3.window.baseTime,
+        sc3.window.duration,
+        sc3.limitAttribute.operator.symbol,
+        sc3.limitAttribute.value
+    );
   }
 }

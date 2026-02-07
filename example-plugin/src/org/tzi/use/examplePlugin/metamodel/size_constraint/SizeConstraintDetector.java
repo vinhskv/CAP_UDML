@@ -13,15 +13,8 @@ import static org.tzi.use.examplePlugin.util.UseUtils.hasSpecificKey;
 
 public class SizeConstraintDetector {
   public SizeConstraintType detectType(ASTInterface astInterface) {
-    if (hasSpecificKey(astInterface, CROSS_REFERENCE)
-        && hasSpecificKey(astInterface, CONFLICT_CHECK)
-        && hasSpecificKey(astInterface, INTERSECTION_OP)
-        && hasSpecificKey(astInterface, MAX)) {
+    if (true) {
       return SizeConstraintType.TYPE1;
-    } else if (hasSpecificKey(astInterface, CHECK_FOR_EXI) && hasSpecificKey(astInterface, ALT_PART)) {
-      return SizeConstraintType.TYPE2;
-    } else if (hasSpecificKey(astInterface, WINDOW)) {
-      return SizeConstraintType.TYPE3;
     }
     // Placeholder implementation
     return SizeConstraintType.UNSUPPORTED;

@@ -9,7 +9,12 @@ public enum OperatorEnum {
   MAX("max", "<"),
   MIN("min", ">"),
   MAX_LIMIT("maxLim", "<="),
-  MIN_LIMIT("minLim", ">=");
+  MIN_LIMIT("minLim", ">="),
+  MAX_ATTR("maxAttr", "<"),
+  MIN_ATTR("minAttr", ">"),
+  MAX_LIM_ATTR("maxLimAttr", "<="),
+  MIN_LIM_ATTR("minLimAttr", ">="),
+  EQUALS("fixAttr", "="),;
 
 
 
@@ -22,4 +27,13 @@ public enum OperatorEnum {
   }
 
   public static final List<OperatorEnum> OPERATORS = List.of(values());
+
+
+  public String getName() {
+    return name;
+  }
+
+  public String getSymbol() {
+    return symbol;
+  }
 }

@@ -4,4 +4,5 @@ public class ConstraintType {
   public static final String SUM_CONSTRAINT = "SumConstraint";
   public static final String ELIGIBILITY_CONSTRAINT = "EligibilityConstraint";
   public static final String SCHEDULE_CONSTRAINT = "ScheduleConstraint";
+  public static final String SIZE_CONSTRAINT = "SizeConstraint";
 }

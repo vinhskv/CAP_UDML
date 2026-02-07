@@ -5,8 +5,11 @@ import org.tzi.use.examplePlugin.metamodel.IfPart;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.RootScope;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.tzi.use.examplePlugin.util.UseUtils.isNumber;
 
 public class GeneratorUtils {
 
@@ -257,6 +260,42 @@ public class GeneratorUtils {
     return prefix != null ? prefix + String.join(".", attrs) : String.join(".", attrs);
   }
 
+  /**
+   * Builds an OCL path with operator and value.
+   * With ->size()
+   * E.g: rolePath="advisor", targetCollection="students", symbol=">", value="5"
+   * -> "self.advisor.students->size() > 5"
+   * @param rolePath
+   * @param targetCollection
+   * @param symbol
+   * @param value
+   * @return
+   */
+  public static String buildSizePathWithOperator(
+      String rolePath,
+      String targetCollection,
+      String symbol,
+      Object value,
+      String selectPart
+  ) {
+    String basePath =
+        Objects.equals(rolePath, "self")
+            ? "self." + targetCollection
+            : "self." + rolePath + "." + targetCollection;
+
+    String collectionExpr =
+        basePath
+            + (selectPart != null ? selectPart : "")
+            + "->size()";
+
+    // only add self. if rolePath is self and value is not number
+    String right =
+        !isNumber(value)
+            ? "self." + value
+            : value.toString();
+
+    return collectionExpr  + " " + symbol + " " + right;
+  }
 
   public static String indent(String s, int spaces) {
     if (s == null || s.isBlank()) return s;

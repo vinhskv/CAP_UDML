@@ -27,12 +27,19 @@ public class ParserUtil {
     Map<String, Object> args =
         (Map<String, Object>) astJson.get(ARGS);
 
+    System.out.println();
+
+    if (args == null || !args.containsKey("ifPart")) {
+      System.out.println("No ifPart found in AST JSON.");
+      return List.of();
+    }
+
+    System.out.println("Parsing ifPart from args: " + args);
+
     List<Map<String, Object>> ifParts =
         (List<Map<String, Object>>) args.get("ifPart");
 
-    if (ifParts == null || ifParts.isEmpty()) {
-      return result;
-    }
+    System.out.println("Found ifParts: " + ifParts);
 
     for (Map<String, Object> cond : ifParts) {
 

@@ -44,4 +44,19 @@ public class UseUtils {
   public static boolean hasSpecificKey(ASTInterface astInterface, String key) {
     return astInterface.args.get(key) != null;
   }
+
+  /**
+   * Check if value is number
+   * @param value the object value
+   * @return
+   */
+  public static boolean isNumber(Object value) {
+    if (value == null) return false;
+    try {
+      Double.parseDouble(value.toString());
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
+    }
+  }
 }

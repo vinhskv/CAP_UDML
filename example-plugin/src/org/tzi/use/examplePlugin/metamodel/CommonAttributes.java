@@ -11,6 +11,7 @@ public class CommonAttributes {
   public static final String SUM_ATTR = "sumAttr";
   public static final String FIX_ATTR = "fixAttr";
   public static final String COLLECT = "collect";
+  public static final String IF_PART = "ifPart";
   public static final String ATTR = "attr";
   public static final String MATCH_ATTR = "matchAttr";
   public static final String MAX = "max";
@@ -33,4 +34,7 @@ public class CommonAttributes {
   public static final String BASE_TIME = "baseTime";
   public static final String DURATION = "duration";
   public static final String UNIT = "unit";
+
+  // size constraint specific
+  public static final String TARGET_COLLECTION = "targetCollection";
 }

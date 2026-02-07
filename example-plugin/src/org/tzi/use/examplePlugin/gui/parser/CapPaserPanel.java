@@ -224,6 +224,7 @@ package org.tzi.use.examplePlugin.gui.parser;
 import org.tzi.use.examplePlugin.ast.ASTInterface;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintExecutor;
+import org.tzi.use.examplePlugin.metamodel.size_constraint.SizeConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintType;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintDetector;
@@ -484,6 +485,17 @@ public class CapPaserPanel extends JPanel {
     if (type.equalsIgnoreCase(ConstraintType.SCHEDULE_CONSTRAINT)) {
       System.out.println("This is a Schedule Constraint.");
       return ScheduleConstraintExecutor.execute(
+          astInterface,
+          ASTToJSONConverter.toJsonObject(astInterface),
+          context,
+          name
+      );
+    }
+
+    // Size Constraint
+    if (type.equalsIgnoreCase(ConstraintType.SIZE_CONSTRAINT)) {
+      System.out.println("This is a Size Constraint.");
+      return SizeConstraintExecutor.execute(
           astInterface,
           ASTToJSONConverter.toJsonObject(astInterface),
           context,

@@ -2,16 +2,15 @@ package org.tzi.use.examplePlugin.metamodel.size_constraint;
 
 import org.tzi.use.examplePlugin.ast.ASTInterface;
 
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ALT_PART;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CHECK_FOR_EXI;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CONFLICT_CHECK;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CROSS_REFERENCE;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.INTERSECTION_OP;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.MAX;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.WINDOW;
-import static org.tzi.use.examplePlugin.util.UseUtils.hasSpecificKey;
-
 public class SizeConstraintDetector {
+  /**
+   * Currently, we have 5 types of size constraints.
+   * However, the type 1 generator and parser are made abstract enough to use for both type 1 to 4
+   *
+   * Type 5 is still under development as we need to confirm the requirements.
+   * @param astInterface
+   * @return
+   */
   public SizeConstraintType detectType(ASTInterface astInterface) {
     if (true) {
       return SizeConstraintType.TYPE1;

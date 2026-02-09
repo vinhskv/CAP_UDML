@@ -115,6 +115,8 @@ public class GeneratorUtils {
     String right = "";
     if (c.scale != null && !c.scale.isEmpty()) {
       right = c.scale + " * " + root + "." + c.attrs.get(0) + "." + c.matchAttr;
+    } else if (isNumber(c.matchAttr)) {
+      right = c.matchAttr.toString();
     } else {
       right = root + "." + c.matchAttr;
     }

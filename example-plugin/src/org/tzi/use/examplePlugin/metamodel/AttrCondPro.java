@@ -9,6 +9,9 @@ public class AttrCondPro {
   public Type type;
   public String scale;
 
+  // like plus = 21, minus = 45, times = 42, div = 47...
+  public String operatorAndValue;
+
   public enum Type {
     MIN_LIM,
     MAX_LIM,

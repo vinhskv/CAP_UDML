@@ -228,6 +228,7 @@ import org.tzi.use.examplePlugin.metamodel.size_constraint.SizeConstraintExecuto
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintType;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintDetector;
+import org.tzi.use.examplePlugin.metamodel.time_constraint.TimeConstraintExecutor;
 import org.tzi.use.examplePlugin.use.ASTToJSONConverter;
 import org.tzi.use.examplePlugin.util.ASTPrinter;
 import org.tzi.use.examplePlugin.util.CommonAttributes;
@@ -496,6 +497,17 @@ public class CapPaserPanel extends JPanel {
     if (type.equalsIgnoreCase(ConstraintType.SIZE_CONSTRAINT)) {
       System.out.println("This is a Size Constraint.");
       return SizeConstraintExecutor.execute(
+          astInterface,
+          ASTToJSONConverter.toJsonObject(astInterface),
+          context,
+          name
+      );
+    }
+
+    // Time Constraint
+    if (type.equalsIgnoreCase(ConstraintType.TIME_CONSTRAINT)) {
+      System.out.println("This is a Time Constraint.");
+      return TimeConstraintExecutor.execute(
           astInterface,
           ASTToJSONConverter.toJsonObject(astInterface),
           context,

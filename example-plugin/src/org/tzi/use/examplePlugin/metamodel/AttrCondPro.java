@@ -4,13 +4,14 @@ import java.util.List;
 
 public class AttrCondPro {
   public List<String> attrs;
+  public List<String> refs;
   public String matchAttr;
   public boolean neg;
   public Type type;
   public String scale;
 
   // like plus = 21, minus = 45, times = 42, div = 47...
-  public String operatorAndValue;
+  public OperatorValue operatorAndValue;
 
   public enum Type {
     MIN_LIM,
@@ -22,6 +23,8 @@ public class AttrCondPro {
     MIN,
     MAX,
     MATCH_STR,
-    FIX_ENUM
+    FIX_ENUM,
+    MAX_ATTR,
+    MIN_ATTR
   }
 }

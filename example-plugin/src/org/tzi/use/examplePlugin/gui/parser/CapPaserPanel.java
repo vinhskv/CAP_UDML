@@ -222,13 +222,21 @@
 package org.tzi.use.examplePlugin.gui.parser;
 
 import org.tzi.use.examplePlugin.ast.ASTInterface;
+import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintDetector;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintExecutor;
+import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintType;
+import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintDetector;
 import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintExecutor;
+import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintType;
+import org.tzi.use.examplePlugin.metamodel.size_constraint.SizeConstraintDetector;
 import org.tzi.use.examplePlugin.metamodel.size_constraint.SizeConstraintExecutor;
+import org.tzi.use.examplePlugin.metamodel.size_constraint.SizeConstraintType;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintType;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintDetector;
+import org.tzi.use.examplePlugin.metamodel.time_constraint.TimeConstraintDetector;
 import org.tzi.use.examplePlugin.metamodel.time_constraint.TimeConstraintExecutor;
+import org.tzi.use.examplePlugin.metamodel.time_constraint.TimeConstraintType;
 import org.tzi.use.examplePlugin.use.ASTToJSONConverter;
 import org.tzi.use.examplePlugin.util.ASTPrinter;
 import org.tzi.use.examplePlugin.util.CommonAttributes;
@@ -383,9 +391,46 @@ public class CapPaserPanel extends JPanel {
       System.out.println("Parsed AST:");
       ASTPrinter.print(ast);
 
-      SumConstraintDetector detector = new SumConstraintDetector();
-      SumConstraintType type = detector.detectType(ast);
-      typeLabel.setText("Type: " + type);
+//      SumConstraintDetector detector = new SumConstraintDetector();
+//      SumConstraintType type = detector.detectType(ast);
+      String type = ASTToJSONConverter.toJsonObject(ast).get(CommonAttributes.TYPE).toString();
+      ConstraintKind kind = ConstraintKindDetector.detect(type);
+
+      switch (kind) {
+        case TIME -> {
+          TimeConstraintDetector detector = new TimeConstraintDetector();
+          TimeConstraintType timeType = detector.detectType(ast);
+          typeLabel.setText("TimeConstraint: " + timeType);
+        }
+
+        case SUM -> {
+          SumConstraintDetector detector = new SumConstraintDetector();
+          SumConstraintType sumType = detector.detectType(ast);
+          typeLabel.setText("SumConstraint: " + sumType);
+        }
+
+        case SIZE -> {
+          SizeConstraintDetector sizeConstraintDetector = new SizeConstraintDetector();
+          SizeConstraintType sizeType = sizeConstraintDetector.detectType(ast);
+          typeLabel.setText("SizeConstraint: " + sizeType);
+        }
+
+        case ELIGIBILITY -> {
+          EligibilityConstraintDetector eligibilityConstraintDetector = new EligibilityConstraintDetector();
+          EligibilityConstraintType eligibilityType = eligibilityConstraintDetector.detectType(ast);
+          typeLabel.setText("EligibilityConstraint: " + eligibilityType);
+        }
+
+        case SCHEDULE -> {
+          ScheduleConstraintDetector scheduleConstraintDetector = new ScheduleConstraintDetector();
+          ScheduleConstraintType scheduleType = scheduleConstraintDetector.detectType(ast);
+          typeLabel.setText("ScheduleConstraint: " + scheduleType);
+        }
+
+        default -> {
+          typeLabel.setText("Unsupported constraint");
+        }
+      }
 
       System.out.println("==============================");
       System.out.println(ASTToJSONConverter.toJsonObject(ast));

@@ -1,23 +1,24 @@
-package org.tzi.use.examplePlugin.metamodel.time_constraint.type1;
+package org.tzi.use.examplePlugin.metamodel.time_constraint.type2;
 
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.RootScope;
 import org.tzi.use.examplePlugin.metamodel.time_constraint.TimeConstraintGenerator;
 
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildAllowedCondition;
+import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildAllowedConditionWithOperator;
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildIfCondition;
 
-public class TimeConstraintType1Generator implements TimeConstraintGenerator<TimeConstraintType1> {
+public class TimeConstraintType2Generator implements TimeConstraintGenerator<TimeConstraintType2> {
   @Override
-  public String generate(String contextClass, String invariantName, TimeConstraintType1 sc1) {
-    System.out.println("Generating ScheduleConstraintType1...");
+  public String generate(String contextClass, String invariantName, TimeConstraintType2 tc2) {
+    System.out.println("Generating TimeConstraintType2...");
 
     // if part
-    String ifCond = buildIfCondition(sc1.ifParts, null);
+    String ifCond = buildIfCondition(tc2.ifParts, null);
     String impliesPart = (ifCond == null) ? "" : ifCond + " implies ";
     System.out.println("Implies Part: " + impliesPart);
     boolean hasIfPart = impliesPart != null && !impliesPart.isBlank();
 
-    String checkForExi = buildAllowedCondition(sc1.checkForExi, RootScope.ALL);
+    String checkForExi = buildAllowedConditionWithOperator(tc2.checkForExi, RootScope.ALL);
     System.out.println("CheckForExi Condition: " + checkForExi);
 
 

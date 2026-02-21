@@ -1,11 +1,13 @@
 package org.tzi.use.examplePlugin.util;
 
+import org.tzi.use.examplePlugin.CaculatorEnum;
 import org.tzi.use.examplePlugin.metamodel.AttrCondPro;
 import org.tzi.use.examplePlugin.metamodel.IfPart;
-import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type3.EligibilityConstraintType3;
+import org.tzi.use.examplePlugin.metamodel.OperatorValue;
 import org.tzi.use.examplePlugin.util.enumarate.IfFixType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +21,10 @@ import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_ENUM;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_NUM;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_STR;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX_LIM;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX_LIM_ATTR;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX_VALUE;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.MIN_LIM;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MIN_LIM_ATTR;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.MIN_VALUE;
 import static org.tzi.use.examplePlugin.util.UseUtils.asString;
 
@@ -52,6 +56,8 @@ public class ParserUtil {
           (Map<String, Object>) cond.get(ARGS);
 
       IfPart ip = new IfPart();
+
+      // attrs
       List<String> attrs = condArgs.entrySet().stream()
           .filter(e -> e.getKey().startsWith("attr"))
           .sorted(Map.Entry.comparingByKey())
@@ -60,6 +66,17 @@ public class ParserUtil {
 
       if (!attrs.isEmpty()) {
         ip.ifAttr = String.join(".", attrs);
+      }
+
+      // refs
+      List<String> refs = condArgs.entrySet().stream()
+          .filter(e -> e.getKey().startsWith("ref"))
+          .sorted(Map.Entry.comparingByKey())
+          .map(e -> asString(e.getValue()))
+          .toList();
+
+      if (!refs.isEmpty()) {
+        ip.refs = String.join(".", refs);
       }
 
       if (condArgs.containsKey(FIX_ATTR)) {
@@ -89,8 +106,24 @@ public class ParserUtil {
       } else if (condArgs.containsKey(MIN_VALUE)) {
         ip.ifFixType = IfFixType.MIN_LIM;
         ip.ifFixValue = asString(condArgs.get(MIN_VALUE));
+      } else if (condArgs.containsKey(MAX_LIM_ATTR)) {
+        ip.ifFixType = IfFixType.MAX_LIM_ATTR;
+        ip.ifFixValue = asString(condArgs.get(MAX_LIM_ATTR));
+      } else if (condArgs.containsKey(MIN_LIM_ATTR)) {
+        ip.ifFixType = IfFixType.MIN_LIM_ATTR;
+        ip.ifFixValue = asString(condArgs.get(MIN_LIM_ATTR));
       }
 
+      // parsing plus=21 or minus=45 or times=42 or div=47...
+      Arrays.stream(CaculatorEnum.values())
+          .filter(e -> condArgs.containsKey(e.name))
+          .findFirst()
+          .ifPresent(e ->
+              ip.operatorAndValue =
+                  new OperatorValue(e.symbol, condArgs.get(e.name))
+          );
+
+      // negated
       if (condArgs.containsKey("negated")) {
         ip.negated = Boolean.TRUE.equals(condArgs.get("negated"));
       }
@@ -101,6 +134,11 @@ public class ParserUtil {
     return result;
   }
 
+  /**
+   * Parse attributes from condition arguments. It looks for keys like "attr", "attr2", "attr3", etc. and collects their values in order.
+   * @param condArgs
+   * @return
+   */
   public static List<String> parseAttrsFromCondArgs(Map<String, Object> condArgs) {
     System.out.println("Parsing attrs from condArgs: " + condArgs);
     List<String> attrs = new ArrayList<>();
@@ -118,6 +156,27 @@ public class ParserUtil {
     return attrs;
   }
 
+  /**
+   * Parse references from condition arguments. It looks for keys like "ref", "ref2", "ref3", etc. and collects their values in order.
+   * @param condArgs
+   * @return
+   */
+  public static List<String> parseRefsFromCondArgs(Map<String, Object> condArgs) {
+    System.out.println("Parsing refs from condArgs: " + condArgs);
+    List<String> refs = new ArrayList<>();
+
+    if (condArgs.containsKey("ref")) {
+      refs.add(asString(condArgs.get("ref")));
+    }
+
+    int i = 2;
+    while (condArgs.containsKey("ref" + i)) {
+      refs.add(asString(condArgs.get("ref" + i)));
+      i++;
+    }
+
+    return refs;
+  }
 
   public static List<AttrCondPro> parseCheckForExi(
       Map<String, Object> args
@@ -139,6 +198,7 @@ public class ParserUtil {
 
       AttrCondPro c = new AttrCondPro();
       c.attrs = ParserUtil.parseAttrsFromCondArgs(condArgs);
+      c.refs = ParserUtil.parseRefsFromCondArgs(condArgs);
       c.neg = Boolean.TRUE.equals(condArgs.get("neg"));
 
       // scale or ratio
@@ -148,6 +208,16 @@ public class ParserUtil {
       c.scale = scale != null
           ? scale.toString()
           : (ratio != null ? ratio.toString() : null);
+
+      // parsing plus=21 or minus=45 or times=42 or div=47...
+      System.out.println("Looking for calculator operator in condArgs: " + condArgs);
+      Arrays.stream(CaculatorEnum.values())
+          .filter(e -> condArgs.containsKey(e.name))
+          .findFirst()
+          .ifPresent(e ->
+              c.operatorAndValue =
+                  new OperatorValue(e.symbol, condArgs.get(e.name))
+          );
 
       if (condArgs.containsKey("minLim")) {
         c.type = AttrCondPro.Type.MIN_LIM;
@@ -173,6 +243,12 @@ public class ParserUtil {
       } else if (condArgs.containsKey("max")) {
         c.type = AttrCondPro.Type.MAX;
         c.matchAttr = String.valueOf(condArgs.get("max"));
+      } else if (condArgs.containsKey("maxAttr")) {
+        c.type = AttrCondPro.Type.MAX_ATTR;
+        c.matchAttr = String.valueOf(condArgs.get("maxAttr"));
+      } else if (condArgs.containsKey("minAttr")) {
+        c.type = AttrCondPro.Type.MIN_ATTR;
+        c.matchAttr = String.valueOf(condArgs.get("minAttr"));
       }
 
       attrConds.add(c);

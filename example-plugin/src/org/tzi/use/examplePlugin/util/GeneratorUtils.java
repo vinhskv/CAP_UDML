@@ -33,17 +33,72 @@ public class GeneratorUtils {
     return ifParts.stream()
         .map(c -> {
           String cond;
-          switch (c.ifFixType) {
-            case FIX_NUM, FIX_BOOL, FIX_ATTR -> cond = resolvedRoot + "." + c.ifAttr + " = " + c.ifFixValue;
-            case FIX_STR, FIX_ENUM -> cond = resolvedRoot + "." + c.ifAttr + " = '" + c.ifFixValue + "'";
-            case MAX_LIM -> cond = resolvedRoot + "." + c.ifAttr + " <= " + c.ifFixValue;
-            case MIN_LIM -> cond = resolvedRoot + "." + c.ifAttr + " >= " + c.ifFixValue;
 
-            default -> throw new RuntimeException("Invalid ifPart");
+          // CASE 1: if refs is specified, use refs to build the condition
+          if (c.refs != null && !c.refs.isEmpty() && c.operatorAndValue != null) {
+            cond = parseByRefs(c, resolvedRoot);
+          }
+          // CASE 2: default parse
+          else {
+            cond = parseByFixType(c, resolvedRoot);
           }
           return c.negated ? "not (" + cond + ")" : cond;
         })
         .collect(Collectors.joining(" and "));
+  }
+
+  private static String parseByRefs(IfPart c, String root) {
+    System.out.println("Parsing by refs for IfPart: " + c.ifFixValue + " with root: " + root);
+
+    // build left hand side path: self.course.credits or e.course.credits
+    String left = String.join(".", root, c.ifAttr);
+
+    // build right hand side path
+    String right = root + "." + String.join(".", c.refs);
+    right = right + (c.ifFixValue.isEmpty() ? "" : ("." + c.ifFixValue));
+
+    if (c.operatorAndValue != null) {
+      right = right + " " + c.operatorAndValue.getOperator() + " " + c.operatorAndValue.getValue();
+    }
+
+    String cond;
+    switch (c.ifFixType) {
+      case MIN_LIM, MIN_LIM_ATTR, MIN_VALUE -> cond = left + " > " + right;
+
+      case MAX_LIM, MAX_LIM_ATTR, MAX_VALUE -> cond = left + " < " + right;
+
+      case FIX_BOOL -> cond = Boolean.parseBoolean(c.ifFixValue)
+          ? left
+          : "not " + left;
+
+      case FIX_STR, FIX_ENUM -> cond = left + " = '" + c.ifFixValue + "'";
+
+      default -> throw new RuntimeException("Unsupported AttrCondPro type: " + c.ifFixType);
+    }
+
+    return c.negated ? "not (" + cond + ")" : cond;
+  }
+
+
+  private static String parseByFixType(IfPart c, String root) {
+    System.out.println("Parsing by fix type for IfPart: " + c.ifFixValue + " with root: " + root);
+
+    return switch (c.ifFixType) {
+      case FIX_NUM, FIX_BOOL, FIX_ATTR ->
+          root + "." + c.ifAttr + " = " + c.ifFixValue;
+
+      case FIX_STR, FIX_ENUM ->
+          root + "." + c.ifAttr + " = '" + c.ifFixValue + "'";
+
+      case MAX_LIM ->
+          root + "." + c.ifAttr + " <= " + c.ifFixValue;
+
+      case MIN_LIM ->
+          root + "." + c.ifAttr + " >= " + c.ifFixValue;
+
+      default ->
+          throw new RuntimeException("Invalid ifPart");
+    };
   }
 
   /**
@@ -121,6 +176,7 @@ public class GeneratorUtils {
       right = root + "." + c.matchAttr;
     }
 
+    // build left hand side path: self.course.credits or e.course.credits
     String path = root + "." + String.join(".", c.attrs);
 
     String cond;
@@ -306,5 +362,99 @@ public class GeneratorUtils {
     return s.lines()
         .map(line -> pad + line)
         .collect(Collectors.joining("\n"));
+  }
+
+  public static String buildAllowedConditionWithOperator(
+      List<AttrCondPro> filters,
+      RootScope scope
+  ) {
+    System.out.println("Building allowed condition for filters: " + filters + " with scope: " + scope);
+    int lastIndex = filters.size() - 1;
+    System.out.println("Last index: " + lastIndex);
+
+    return IntStream.range(0, filters.size())
+        .mapToObj(i -> buildSingleAllowedConditionWithOperator(
+            filters.get(i),
+            scope,
+            i == lastIndex
+        ))
+        .collect(Collectors.joining(" and "));
+  }
+
+  private static String buildSingleAllowedConditionWithOperator(
+      AttrCondPro c,
+      RootScope scope,
+      boolean isLast
+  ) {
+
+    String root;
+    if (scope == RootScope.ALL) {
+      root = "self";
+    } else if (scope == RootScope.LAST_ONLY && isLast) {
+      root = "self";
+    } else {
+      root = "e";
+    }
+
+    String matchAttr = "";
+    matchAttr = buildMatchAttr(c, root);
+
+    // build left hand side path: self.course.credits or e.course.credits
+    String left = root + "." + String.join(".", c.attrs);
+
+    // build right hand side path
+    String right;
+
+    if ("now()".equals(matchAttr)) {
+      // now()
+      right = matchAttr;
+    } else {
+      right = root + "." + String.join(".", c.refs);
+
+      if (!matchAttr.isEmpty()) {
+        right = right + "." + matchAttr;
+      }
+    }
+
+    // add operator if specified
+    if (c.operatorAndValue != null) {
+      right = right + " " + c.operatorAndValue.getOperator() + " " + c.operatorAndValue.getValue();
+    }
+
+
+    String cond;
+    switch (c.type) {
+      case MIN_LIM, MIN_LIM_ATTR, MIN, MIN_ATTR -> cond = left + " > " + right;
+
+      case MAX_LIM, MAX_LIM_ATTR, MAX, MAX_ATTR -> cond = left + " < " + right;
+
+      case FIX_BOOL -> cond = Boolean.parseBoolean(c.matchAttr.toString())
+          ? left
+          : "not " + left;
+
+      case MATCH_STR, FIX_ENUM -> cond = left + " = '" + c.matchAttr + "'";
+
+      default -> throw new RuntimeException("Unsupported AttrCondPro type: " + c.type);
+    }
+
+    return c.neg ? "not (" + cond + ")" : cond;
+  }
+
+  private static String buildMatchAttr(AttrCondPro c, String root) {
+
+    // CASE: now()
+    if ("now".equalsIgnoreCase(String.valueOf(c.matchAttr))) {
+      return "now()";
+    }
+
+    if (c.scale != null && !c.scale.isEmpty()) {
+      return c.scale + " * " + root + "." + c.attrs.get(0) + "." + c.matchAttr;
+    }
+
+    if (isNumber(c.matchAttr)) {
+      return c.matchAttr.toString();
+    }
+
+    return c.matchAttr.toString();
   }
 }

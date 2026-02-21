@@ -8,4 +8,7 @@ public class IfPart {
   public IfFixType ifFixType;
   public String ifFixValue;
   public boolean negated;
+
+  public String refs;
+  public OperatorValue operatorAndValue;
 }

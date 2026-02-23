@@ -7,6 +7,7 @@ public class CommonAttributes {
     // Attributes for constraints
     public static final String COLLECT = "collect";
     public static final String FIX_ATTR = "fixAttr";
+    public static final String MATCH_ATTR = "matchAttr";
     public static final String FIX_NUM = "fixNum";
     public static final String FIX_BOOL = "fixBool";
     public static final String FIX_STR = "fixStr";

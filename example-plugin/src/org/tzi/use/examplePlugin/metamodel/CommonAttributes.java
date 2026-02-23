@@ -37,4 +37,7 @@ public class CommonAttributes {
 
   // size constraint specific
   public static final String TARGET_COLLECTION = "targetCollection";
+
+  // status constraint specific
+  public static final String CHECK_STATUS = "checkStatus";
 }

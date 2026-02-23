@@ -2,6 +2,7 @@ package org.tzi.use.examplePlugin.util;
 
 import org.tzi.use.examplePlugin.metamodel.AttrCondPro;
 import org.tzi.use.examplePlugin.metamodel.IfPart;
+import org.tzi.use.examplePlugin.metamodel.OperatorValue;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.RootScope;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class GeneratorUtils {
           String cond;
 
           // CASE 1: if refs is specified, use refs to build the condition
-          if (c.refs != null && !c.refs.isEmpty() && c.operatorAndValue != null) {
+          if (/*c.refs != null && !c.refs.isEmpty() &&*/ c.operatorAndValue != null) {
             cond = parseByRefs(c, resolvedRoot);
           }
           // CASE 2: default parse
@@ -49,16 +50,27 @@ public class GeneratorUtils {
 
   private static String parseByRefs(IfPart c, String root) {
     System.out.println("Parsing by refs for IfPart: " + c.ifFixValue + " with root: " + root);
+    System.out.println("Calsize: " + c.calSize);
 
     // build left hand side path: self.course.credits or e.course.credits
     String left = String.join(".", root, c.ifAttr);
 
+    // calSize
+    if (c.calSize != null && c.calSize) {
+      left = left + "->size()";
+    }
+
     // build right hand side path
-    String right = root + "." + String.join(".", c.refs);
+    // String right = root + "." + String.join(".", c.refs);
+    String right = root;
+
+    if (c.refs != null && !c.refs.isEmpty()) {
+      right = right + "." + String.join(".", c.refs);
+    }
     right = right + (c.ifFixValue.isEmpty() ? "" : ("." + c.ifFixValue));
 
     if (c.operatorAndValue != null) {
-      right = right + " " + c.operatorAndValue.getOperator() + " " + c.operatorAndValue.getValue();
+      right = right + " " + renderOperatorValue(c.operatorAndValue);
     }
 
     String cond;
@@ -66,6 +78,8 @@ public class GeneratorUtils {
       case MIN_LIM, MIN_LIM_ATTR, MIN_VALUE -> cond = left + " > " + right;
 
       case MAX_LIM, MAX_LIM_ATTR, MAX_VALUE -> cond = left + " < " + right;
+
+      case MATCH_ATTR, FIX_ATTR -> cond = left + " = " + right;
 
       case FIX_BOOL -> cond = Boolean.parseBoolean(c.ifFixValue)
           ? left
@@ -82,22 +96,63 @@ public class GeneratorUtils {
 
   private static String parseByFixType(IfPart c, String root) {
     System.out.println("Parsing by fix type for IfPart: " + c.ifFixValue + " with root: " + root);
+    System.out.println("ifAttr: " + c.ifAttr + ", ifFixType: " + c.ifFixType + ", ifFixValue: " + c.ifFixValue);
+    System.out.println("Calsize: " + c.calSize);
+
+    // calSize
+    if (c.calSize != null && c.calSize) {
+      root = root + "." + c.ifAttr + "->size()";
+    } else {
+      root = root + "." + c.ifAttr;
+    }
 
     return switch (c.ifFixType) {
       case FIX_NUM, FIX_BOOL, FIX_ATTR ->
-          root + "." + c.ifAttr + " = " + c.ifFixValue;
+          root + " = " + c.ifFixValue;
 
       case FIX_STR, FIX_ENUM ->
-          root + "." + c.ifAttr + " = '" + c.ifFixValue + "'";
+          root + " = '" + c.ifFixValue + "'";
 
-      case MAX_LIM ->
-          root + "." + c.ifAttr + " <= " + c.ifFixValue;
+      case MAX_LIM, MAX, MAX_VALUE ->
+          root + " <= " + c.ifFixValue;
 
-      case MIN_LIM ->
-          root + "." + c.ifAttr + " >= " + c.ifFixValue;
+      case MIN_LIM, MIN, MIN_VALUE ->
+          root + " >= " + c.ifFixValue;
 
       default ->
           throw new RuntimeException("Invalid ifPart");
+    };
+  }
+
+  /**
+   * Normalize operator
+   */
+  private static String renderOperatorValue(OperatorValue ov) {
+    String operator = ov.getOperator();
+    Object value = ov.getValue();
+
+    if (value instanceof Number) {
+      double v = ((Number) value).doubleValue();
+
+      if (v < 0) {
+        operator = invertOperator(operator);
+        v = Math.abs(v);
+
+        if (value instanceof Integer || value instanceof Long) {
+          return operator + " " + (long) v;
+        }
+        return operator + " " + v;
+      }
+    }
+
+    return operator + " " + value;
+  }
+
+  private static String invertOperator(String operator) {
+    return switch (operator) {
+      case "+" -> "-";
+      case "-" -> "+";
+      default -> operator;
     };
   }
 
@@ -158,6 +213,7 @@ public class GeneratorUtils {
       boolean isLast
   ) {
 
+    System.out.println("Condition type is: " + c.type);
     String root;
     if (scope == RootScope.ALL) {
       root = "self";
@@ -185,11 +241,13 @@ public class GeneratorUtils {
 
       case MAX_LIM, MAX_LIM_ATTR, MAX -> cond = path + " > " + right;
 
+      case MATCH_ATTR ->  cond = path + " = " + right;
+
       case FIX_BOOL -> cond = Boolean.parseBoolean(c.matchAttr.toString())
           ? path
           : "not " + path;
 
-      case MATCH_STR, FIX_ENUM -> cond = path + " = '" + c.matchAttr + "'";
+      case MATCH_STR, FIX_ENUM, FIX_STR -> cond = path + " = '" + c.matchAttr + "'";
 
       default -> throw new RuntimeException("Unsupported AttrCondPro type: " + c.type);
     }

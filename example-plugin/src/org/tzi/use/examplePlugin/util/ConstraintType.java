@@ -6,4 +6,5 @@ public class ConstraintType {
   public static final String SCHEDULE_CONSTRAINT = "ScheduleConstraint";
   public static final String SIZE_CONSTRAINT = "SizeConstraint";
   public static final String TIME_CONSTRAINT = "TimeConstraint";
+  public static final String STATUS_CONSTRAINT = "StatusConstraint";
 }

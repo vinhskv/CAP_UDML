@@ -20,6 +20,8 @@ import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_BOOL;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_ENUM;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_NUM;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.FIX_STR;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MATCH_ATTR;
+import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX_ATTR;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX_LIM;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX_LIM_ATTR;
 import static org.tzi.use.examplePlugin.util.CommonAttributes.MAX_VALUE;
@@ -79,9 +81,9 @@ public class ParserUtil {
         ip.refs = String.join(".", refs);
       }
 
-      if (condArgs.containsKey(FIX_ATTR)) {
+      if (condArgs.containsKey(FIX_ATTR) || condArgs.containsKey(MATCH_ATTR)) {
         ip.ifFixType = IfFixType.FIX_ATTR;
-        ip.ifFixValue = asString(condArgs.get(FIX_ATTR));
+        ip.ifFixValue = asString(condArgs.get(FIX_ATTR) != null ? condArgs.get(FIX_ATTR) : condArgs.get(MATCH_ATTR));
       } else if (condArgs.containsKey(FIX_NUM)) {
         ip.ifFixType = IfFixType.FIX_NUM;
         ip.ifFixValue = asString(condArgs.get(FIX_NUM));
@@ -99,7 +101,7 @@ public class ParserUtil {
         ip.ifFixValue = asString(condArgs.get(MAX_LIM));
       } else if (condArgs.containsKey(MIN_LIM)) {
         ip.ifFixType = IfFixType.MIN_VALUE;
-        ip.ifFixValue = asString(condArgs.get(MAX_LIM));
+        ip.ifFixValue = asString(condArgs.get(MIN_LIM));
       } else if (condArgs.containsKey(MAX_VALUE)) {
         ip.ifFixType = IfFixType.MAX_LIM;
         ip.ifFixValue = asString(condArgs.get(MAX_VALUE));
@@ -112,6 +114,12 @@ public class ParserUtil {
       } else if (condArgs.containsKey(MIN_LIM_ATTR)) {
         ip.ifFixType = IfFixType.MIN_LIM_ATTR;
         ip.ifFixValue = asString(condArgs.get(MIN_LIM_ATTR));
+      } else if (condArgs.containsKey("min")) {
+        ip.ifFixType = IfFixType.MIN;
+        ip.ifFixValue = asString(condArgs.get("min"));
+      } else if (condArgs.containsKey("max")) {
+        ip.ifFixType = IfFixType.MAX;
+        ip.ifFixValue = asString(condArgs.get("max"));
       }
 
       // parsing plus=21 or minus=45 or times=42 or div=47...
@@ -126,6 +134,14 @@ public class ParserUtil {
       // negated
       if (condArgs.containsKey("negated")) {
         ip.negated = Boolean.TRUE.equals(condArgs.get("negated"));
+      }
+
+      // calSize
+      ip.calSize = false;
+
+      if (condArgs.containsKey("calSize")) {
+        Object v = condArgs.get("calSize");
+        ip.calSize = Boolean.parseBoolean(String.valueOf(v));
       }
 
       result.add(ip);
@@ -178,12 +194,22 @@ public class ParserUtil {
     return refs;
   }
 
+  /**
+   * Parse checkForExi conditions from the given arguments. It looks for a list of conditions under the specified key (defaulting to CHECK_FOR_EXI) and converts each condition into an AttrCondPro object.
+   * @param args
+   * @param key
+   * @return
+   */
   public static List<AttrCondPro> parseCheckForExi(
-      Map<String, Object> args
+      Map<String, Object> args, String key
   ) {
 
+    for (Map.Entry<String, Object> entry : args.entrySet()) {
+      System.out.println("Checking key in args: " + entry.getKey());
+    }
+
     List<Map<String, Object>> checkForExi =
-        (List<Map<String, Object>>) args.get(CHECK_FOR_EXI);
+        (List<Map<String, Object>>) args.get(key == null ? CHECK_FOR_EXI : key);
 
     if (checkForExi == null || checkForExi.isEmpty()) return null;
 
@@ -249,6 +275,9 @@ public class ParserUtil {
       } else if (condArgs.containsKey("minAttr")) {
         c.type = AttrCondPro.Type.MIN_ATTR;
         c.matchAttr = String.valueOf(condArgs.get("minAttr"));
+      } else if (condArgs.containsKey("fixStr")) {
+        c.type = AttrCondPro.Type.FIX_STR;
+        c.matchAttr = String.valueOf(condArgs.get("fixStr"));
       }
 
       attrConds.add(c);

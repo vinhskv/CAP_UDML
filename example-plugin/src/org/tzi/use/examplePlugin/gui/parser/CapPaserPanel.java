@@ -231,6 +231,9 @@ import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstrain
 import org.tzi.use.examplePlugin.metamodel.size_constraint.SizeConstraintDetector;
 import org.tzi.use.examplePlugin.metamodel.size_constraint.SizeConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.size_constraint.SizeConstraintType;
+import org.tzi.use.examplePlugin.metamodel.status_constraint.StatusConstraintDetector;
+import org.tzi.use.examplePlugin.metamodel.status_constraint.StatusConstraintExecutor;
+import org.tzi.use.examplePlugin.metamodel.status_constraint.StatusConstraintType;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintType;
 import org.tzi.use.examplePlugin.metamodel.sum_constraint.SumConstraintDetector;
@@ -427,6 +430,12 @@ public class CapPaserPanel extends JPanel {
           typeLabel.setText("ScheduleConstraint: " + scheduleType);
         }
 
+        case STATUS -> {
+          StatusConstraintDetector statusConstraintDetector = new StatusConstraintDetector();
+          StatusConstraintType statusType = statusConstraintDetector.detectType(ast);
+          typeLabel.setText("StatusConstraint: " + statusType);
+        }
+
         default -> {
           typeLabel.setText("Unsupported constraint");
         }
@@ -553,6 +562,17 @@ public class CapPaserPanel extends JPanel {
     if (type.equalsIgnoreCase(ConstraintType.TIME_CONSTRAINT)) {
       System.out.println("This is a Time Constraint.");
       return TimeConstraintExecutor.execute(
+          astInterface,
+          ASTToJSONConverter.toJsonObject(astInterface),
+          context,
+          name
+      );
+    }
+
+    // Status Constraint
+    if (type.equalsIgnoreCase(ConstraintType.STATUS_CONSTRAINT)) {
+      System.out.println("This is a Status Constraint.");
+      return StatusConstraintExecutor.execute(
           astInterface,
           ASTToJSONConverter.toJsonObject(astInterface),
           context,

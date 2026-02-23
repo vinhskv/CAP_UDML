@@ -11,4 +11,6 @@ public class IfPart {
 
   public String refs;
   public OperatorValue operatorAndValue;
+
+  public Boolean calSize;
 }

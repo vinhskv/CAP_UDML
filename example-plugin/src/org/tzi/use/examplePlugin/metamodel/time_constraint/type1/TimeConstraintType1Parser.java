@@ -27,7 +27,7 @@ public class TimeConstraintType1Parser implements TimeConstraintParser<TimeConst
     System.out.println("Parsed ifParts: " + tc1.ifParts);
 
     // check for existence parts
-    tc1.checkForExi = ParserUtil.parseCheckForExi(args);
+    tc1.checkForExi = ParserUtil.parseCheckForExi(args, null);
     System.out.println("Parsed checkForExi: " + tc1.checkForExi);
 
     return tc1;

@@ -1,66 +1,63 @@
-package org.tzi.use.examplePlugin.metamodel.size_constraint.type1;
+package org.tzi.use.examplePlugin.metamodel.status_constraint.type3;
 
 import org.tzi.use.examplePlugin.metamodel.AttrCondPro;
-import org.tzi.use.examplePlugin.metamodel.OperatorEnum;
-import org.tzi.use.examplePlugin.metamodel.size_constraint.Bound;
-import org.tzi.use.examplePlugin.metamodel.size_constraint.SizeConstraintParser;
+import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.type1.EligibilityConstraintType1;
+import org.tzi.use.examplePlugin.metamodel.status_constraint.StatusConstraintParser;
 import org.tzi.use.examplePlugin.util.ParserUtil;
-import org.tzi.use.examplePlugin.util.enumarate.BoundType;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ARGS;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ASSOC_CLS;
+import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CHECK_STATUS;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.COLLECT;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CONFLICT_CHECK;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CROSS_REFERENCE;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.INTERSECTION_OP;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.MAX;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ROLE_PATH;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.TARGET_ASSOC;
-import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.TARGET_COLLECTION;
+import static org.tzi.use.examplePlugin.util.ParserUtil.parseCheckForExi;
 import static org.tzi.use.examplePlugin.util.ParserUtil.parseIfPart;
-import static org.tzi.use.examplePlugin.util.UseUtils.asString;
 
-public class SizeConstraintType1Parser implements SizeConstraintParser<SizeConstraintType1> {
+public class StatusConstraintType3Parser implements StatusConstraintParser<StatusConstraintType3> {
 
   @Override
-  public SizeConstraintType1 parse(Map<String, Object> astJson) {
-    SizeConstraintType1 sc1 = new SizeConstraintType1();
+  public StatusConstraintType3 parse(Map<String, Object> astJson) {
+    for (Map.Entry<String, Object> entry : astJson.entrySet()) {
+      System.out.println("AST JSON Entry: " + entry.getKey() + " -> " + entry.getValue() + " " + entry.getValue().getClass());
+    }
 
-    System.out.println("Parsing SizeConstraintType1...");
+    StatusConstraintType3 sc3 = new StatusConstraintType3();
+
+    System.out.println("Parsing StatusConstraintType3...");
 
     // ---- root args ----
     Map<String, Object> args = (Map<String, Object>) astJson.get(ARGS);
-    sc1.assocCls = (String) args.get(ASSOC_CLS);
-    sc1.rolePath = (String) args.get(ROLE_PATH);
-    sc1.targetCollection = (String) args.get(TARGET_COLLECTION);
 
-    System.out.println("After parsing root args: assocCls="
-        + sc1.assocCls + ", rolePath=" + sc1.rolePath
-        + ", targetCollection=" + sc1.targetCollection);
+    sc3.assocCls = (String) args.get(ASSOC_CLS);
+    sc3.rolePath = (String) args.get(ROLE_PATH);
 
-    sc1.ifParts = parseIfPart(astJson);
-    System.out.println("Parsed ifParts: " + sc1.ifParts);
-
+    sc3.ifParts = parseIfPart(astJson);
+    System.out.println("Parsed ifParts: " + sc3.ifParts);
 
     // collect
-    parseCollect(args, sc1);
-    System.out.println("After parsing collect, filters: " + sc1.filters);
+    parseCollect(args, sc3);
 
-    // parse bounds
-    parseBound(args, sc1);
-    System.out.println("After parsing bounds, bounds: " + sc1.bounds);
+    Object object = args.get(CHECK_STATUS);
+    if (object != null) {
+      System.out.println("Raw checkStatus value: " + object + " of type " + object.getClass());
+      sc3.checkStatus = object instanceof List ? (List<Integer>) object : null;
+    }
+    System.out.println("Parsed checkStatus: " + sc3.checkStatus);
+    if (sc3.checkStatus.get(0) != 0) {
+      throw new InvalidParameterException("checkStatus must start with 0 for this type");
+    }
 
-    return sc1;
+    return sc3;
   }
 
   private static void parseCollect(
       Map<String, Object> args,
-      SizeConstraintType1 sc1
+      StatusConstraintType3 sc3
   ) {
 
     List<Map<String, Object>> collect =
@@ -75,6 +72,8 @@ public class SizeConstraintType1Parser implements SizeConstraintParser<SizeConst
       Map<String, Object> condArgs =
           (Map<String, Object>) attrCond.get(ARGS);
 
+      System.out.println("Parsing collect condition: " + condArgs);
+
       AttrCondPro c = new AttrCondPro();
       c.attrs = ParserUtil.parseAttrsFromCondArgs(condArgs);
       c.neg = Boolean.TRUE.equals(condArgs.get("neg"));
@@ -88,7 +87,7 @@ public class SizeConstraintType1Parser implements SizeConstraintParser<SizeConst
       } else if (condArgs.containsKey("fixBool")) {
         c.type = AttrCondPro.Type.FIX_BOOL;
         c.matchAttr = String.valueOf(condArgs.get("fixBool"));
-      } else if (condArgs.containsKey("fixNum")) {
+      } else if(condArgs.containsKey("fixNum")) {
         c.type = AttrCondPro.Type.FIX_NUM;
         c.matchAttr = String.valueOf(condArgs.get("fixNum"));
       } else if (condArgs.containsKey("minLimAttr")) {
@@ -110,24 +109,20 @@ public class SizeConstraintType1Parser implements SizeConstraintParser<SizeConst
                 ? condArgs.get("matchStr")
                 : condArgs.get("fixStr")
         );
+      } else if (condArgs.containsKey("matchAttr")) {
+        c.type = AttrCondPro.Type.MATCH_ATTR;
+        c.matchAttr = String.valueOf(condArgs.get("matchAttr"));
+      } else if (condArgs.containsKey("maxAttr")) {
+        c.type = AttrCondPro.Type.MAX_ATTR;
+        c.matchAttr = String.valueOf(condArgs.get("maxAttr"));
+      } else if (condArgs.containsKey("minAttr")) {
+        c.type = AttrCondPro.Type.MIN_ATTR;
+        c.matchAttr = String.valueOf(condArgs.get("minAttr"));
       }
 
       attrConds.add(c);
     }
 
-    sc1.filters = attrConds;
-    System.out.println("Parsed filters: " + sc1.filters);
-  }
-
-  private void parseBound(Map<String, Object> args,
-                          SizeConstraintType1 sc1) {
-    List<Bound> bounds = new ArrayList<>();
-    Arrays.stream(OperatorEnum.values()).forEach(boundType -> {
-      String boundKey = boundType.getName();
-      if (args.containsKey(boundKey)) {
-        bounds.add(new Bound(boundType, asString(args.get(boundKey))));
-      }
-    });
-    sc1.bounds = bounds;
+    sc3.filters = attrConds;
   }
 }

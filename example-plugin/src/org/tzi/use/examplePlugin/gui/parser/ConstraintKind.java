@@ -6,6 +6,7 @@ public enum ConstraintKind {
   ELIGIBILITY,
   SCHEDULE,
   SIZE,
+  STATUS,
+  RETAKE,
   UNKNOWN,
-  STATUS
 }

@@ -225,6 +225,9 @@ import org.tzi.use.examplePlugin.ast.ASTInterface;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintDetector;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.eligibility_constraint.EligibilityConstraintType;
+import org.tzi.use.examplePlugin.metamodel.retake_constraint.RetakeConstraintDetector;
+import org.tzi.use.examplePlugin.metamodel.retake_constraint.RetakeConstraintExecutor;
+import org.tzi.use.examplePlugin.metamodel.retake_constraint.RetakeConstraintType;
 import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintDetector;
 import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintExecutor;
 import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstraintType;
@@ -436,6 +439,12 @@ public class CapPaserPanel extends JPanel {
           typeLabel.setText("StatusConstraint: " + statusType);
         }
 
+        case RETAKE -> {
+          RetakeConstraintDetector retakeConstraintDetector = new RetakeConstraintDetector();
+          RetakeConstraintType retakeType = retakeConstraintDetector.detectType(ast);
+          typeLabel.setText("RetakeConstraint: " + retakeType);
+        }
+
         default -> {
           typeLabel.setText("Unsupported constraint");
         }
@@ -573,6 +582,17 @@ public class CapPaserPanel extends JPanel {
     if (type.equalsIgnoreCase(ConstraintType.STATUS_CONSTRAINT)) {
       System.out.println("This is a Status Constraint.");
       return StatusConstraintExecutor.execute(
+          astInterface,
+          ASTToJSONConverter.toJsonObject(astInterface),
+          context,
+          name
+      );
+    }
+
+    // Retake Constraint
+    if (type.equalsIgnoreCase(ConstraintType.RETAKE_CONSTRAINT)) {
+      System.out.println("This is a Retake Constraint.");
+      return RetakeConstraintExecutor.execute(
           astInterface,
           ASTToJSONConverter.toJsonObject(astInterface),
           context,

@@ -235,6 +235,11 @@ public class GeneratorUtils {
     // build left hand side path: self.course.credits or e.course.credits
     String path = root + "." + String.join(".", c.attrs);
 
+    // in case c.type is null, (like we only have attr=value and attr2=value2), we will treat it as path
+    if (c.type == null) {
+      return path;
+    }
+
     String cond;
     switch (c.type) {
       case MIN_LIM, MIN_LIM_ATTR, MIN -> cond = path + " < " + right;
@@ -252,7 +257,7 @@ public class GeneratorUtils {
       default -> throw new RuntimeException("Unsupported AttrCondPro type: " + c.type);
     }
 
-    return c.neg ? "not (" + cond + ")" : cond;
+    return cond;
   }
 
 
@@ -515,4 +520,19 @@ public class GeneratorUtils {
 
     return c.matchAttr.toString();
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

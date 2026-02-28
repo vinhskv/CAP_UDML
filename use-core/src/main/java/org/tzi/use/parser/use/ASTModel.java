@@ -21,7 +21,9 @@ package org.tzi.use.parser.use;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.antlr.runtime.Token;
 import org.tzi.use.parser.Context;
@@ -49,6 +51,7 @@ public class ASTModel extends ASTAnnotatable {
     private final List<ASTSignal> signals;
     private final List<ASTConstraintDefinition> fConstraints;
     private final List<ASTPrePost> fPrePosts;
+    private final List<CAPAnnotation> capAnnos;
 
     public ASTModel(Token name) {
         fName = name;
@@ -60,6 +63,7 @@ public class ASTModel extends ASTAnnotatable {
         fConstraints = new ArrayList<>();
         fPrePosts = new ArrayList<>();
         signals = new ArrayList<>();
+        capAnnos = new ArrayList<>();
     }
 
     public void addEnumTypeDef(ASTEnumTypeDefinition etd) {
@@ -93,6 +97,11 @@ public class ASTModel extends ASTAnnotatable {
 	public void addSignal(ASTSignal s) {
 		this.signals.add(s);		
 	}
+
+  public void setCapAnnotations(List<CAPAnnotation> capAnnos) {
+      this.capAnnos.clear();
+      this.capAnnos.addAll(capAnnos);
+  }
 	
     public MModel gen(Context ctx) {
         MModel model = ctx.modelFactory().createModel(fName.getText());
@@ -336,10 +345,99 @@ public class ASTModel extends ASTAnnotatable {
             ac.genStateMachineTransitions(ctx);
         }
 
+
+        // (6) generate annotations
+        // debug purpose only
+        /* for (CAPAnnotation capAnnotation : capAnnos) {
+            print(capAnnotation);
+            System.out.println("Json representation:" + toJsonObject(capAnnotation));
+            System.out.println("================================");
+        }*/
+
+        // set the annotation for the MModel
+        model.setCapAnnotations(capAnnos);
+
         return model;
     }
 
     public String toString() {
         return "(" + fName + ")";
+    }
+
+    public static void print(CAPAnnotation ast) {
+        printAny(ast, 0);
+    }
+
+    private static void printAny(Object obj, int indent) {
+        String pad = "  ".repeat(indent);
+
+        if (obj == null) {
+            System.out.println(pad + "null");
+            return;
+        }
+
+        if (obj instanceof CAPAnnotation) {
+            CAPAnnotation ast = (CAPAnnotation) obj;
+            System.out.println(pad + ast.name);
+            ast.capArgs.forEach((k, v) -> {
+                System.out.print(pad + "  " + k + " = ");
+                printAny(v, indent + 2);
+            });
+            return;
+        }
+
+        if (obj instanceof List<?>) {
+            List<?> list = (List<?>) obj;
+            System.out.println(pad + "[");
+            for (Object o : list) {
+                printAny(o, indent + 1);
+            }
+            System.out.println(pad + "]");
+            return;
+        }
+
+        // primitive / string / fallback
+        System.out.println(pad + obj);
+    }
+
+
+    public static Map<String, Object> toJsonObject(CAPAnnotation ast) {
+        Map<String, Object> json = new LinkedHashMap<>();
+
+        json.put("type", ast.name);
+
+        Map<String, Object> args = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> e : ast.capArgs.entrySet()) {
+            args.put(e.getKey(), convertValue(e.getValue()));
+        }
+
+        json.put("args", args);
+        return json;
+    }
+
+    private static Object convertValue(Object v) {
+        if (v == null) {
+            return null;
+        }
+
+        if (v instanceof String ||
+            v instanceof Number ||
+            v instanceof Boolean) {
+            return v;
+        }
+
+        if (v instanceof CAPAnnotation) {
+            return toJsonObject((CAPAnnotation) v);
+        }
+
+        if (v instanceof List<?>) {
+            List<Object> list = new ArrayList<>();
+            for (Object o : (List<?>) v) {
+                list.add(convertValue(o));
+            }
+            return list;
+        }
+
+        throw new IllegalArgumentException("Unsupported AST value: " + v.getClass());
     }
 }

@@ -17,6 +17,9 @@
     } 
 */
 model returns [ASTModel n]
+@init {
+    List<CAPAnnotation> capAnnos = new ArrayList<CAPAnnotation>();
+}
 :
 	as = annotationSet
     'model' modelName=IDENT { $n = new ASTModel($modelName); $n.setAnnotations($as.annotations); }
@@ -28,7 +31,9 @@ model returns [ASTModel n]
           )*  
         )
       | e=enumTypeDefinition { $n.addEnumTypeDef($e.n); }
+      | ca=capAnnotation { capAnnos.add($ca.ann); }
     )*
+    { $n.setCapAnnotations(capAnnos); }
     EOF
     ;
     
@@ -501,6 +506,93 @@ signalDefinition[boolean isAbstract] returns [ASTSignal n]:
     )?
     'end'
     ;  
+
+capAnnotation returns [CAPAnnotation ann]
+@init {
+   List<Map.Entry<String,Object>> args = new ArrayList<Map.Entry<String,Object>>();
+}
+:
+   '@' name=IDENT '('
+       (arg=capArg { args.add($arg.entry); }
+        (',' arg=capArg { args.add($arg.entry); })* )?
+   ')'
+   {
+       $ann = new CAPAnnotation($name.getText());
+       for(Map.Entry<String,Object> e : args) {
+           $ann.addArg(e.getKey(), e.getValue());
+       }
+   }
+;
+
+
+capArg returns [Map.Entry<String,Object> entry]
+:
+   key=IDENT '=' value=capValue
+   {
+       $entry = new java.util.AbstractMap.SimpleEntry<>($key.getText(), $value.val);
+   }
+;
+
+
+capValue returns [Object val]
+:
+    s1=NON_OCL_STRING
+        {
+            $val = $s1.getText().substring(1, $s1.getText().length() - 1);
+        }
+
+      // 'abc'
+      | s2=STRING
+        {
+            $val = $s2.getText().substring(1, $s2.getText().length() - 1);
+        }
+   | n=INT         { $val = Integer.parseInt($n.getText()); }
+   | f=FLOAT       { $val = Double.parseDouble($f.getText()); }
+   | t='true'      { $val = Boolean.TRUE; }
+   | f2='false'    { $val = Boolean.FALSE; }
+   | q=qualifiedName { $val = $q.text; }
+
+   // enum
+   | e=enumRef       { $val = $e.text; }
+
+   // nested annotation
+   | ann=capAnnotation { $val = $ann.ann; }
+
+   // annotation block: { @A(), @B() }
+   | blk=capBlock { $val = $blk.list; }
+
+;
+
+
+// qualifiedName ::= IDENT ( '.' IDENT )*
+qualifiedName
+returns [String text]
+@init { StringBuilder sb = new StringBuilder(); }
+:
+    i1=IDENT { sb.append($i1.getText()); }
+    ( '.' i2=IDENT { sb.append('.').append($i2.getText()); } )*
+    { $text = sb.toString(); }
+;
+
+// COLON
+enumRef
+returns [String text]
+:
+    t=IDENT COLON_COLON c=IDENT
+    { $text = $t.getText() + "::" + $c.getText(); }
+;
+
+capBlock returns [List<Object> list]
+@init { $list = new ArrayList<Object>(); }
+:
+    '{'
+      (
+        v=capValue { $list.add($v.val); }
+        (',' v=capValue { $list.add($v.val); })*
+      )?
+    '}'
+;
+
 
 keyUnion:
   {input.LT(1).getText().equals("union")}? IDENT ;

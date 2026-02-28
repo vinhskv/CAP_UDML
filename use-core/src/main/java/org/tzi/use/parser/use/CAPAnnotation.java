@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CAPAnnotation {
-  private String name;
-  private Map<String, Object> capArgs = new LinkedHashMap<>();
+  public String name;
+  public Map<String, Object> capArgs = new LinkedHashMap<>();
 
   public CAPAnnotation(String name) {
     this.name = name;

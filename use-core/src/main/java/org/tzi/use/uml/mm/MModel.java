@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import org.eclipse.jdt.annotation.Nullable;
 import org.tzi.use.graph.DirectedGraph;
 import org.tzi.use.graph.DirectedGraphBase;
+import org.tzi.use.parser.use.CAPAnnotation;
 import org.tzi.use.uml.mm.commonbehavior.communications.MSignal;
 import org.tzi.use.uml.ocl.type.EnumType;
 import org.tzi.use.util.StringUtil;
@@ -71,6 +72,9 @@ public class MModel extends MModelElementImpl {
 
 	private final Map<String, MSignal> signals;
 
+	// cap annotations
+	private final List<CAPAnnotation> capAnnotations;
+
 	protected MModel(String name) {
 		super(name);
 		fEnumTypes = new TreeMap<>();
@@ -83,6 +87,12 @@ public class MModel extends MModelElementImpl {
 		signals = new TreeMap<>();
 
 		fFilename = "";
+		capAnnotations = new ArrayList<>();
+	}
+
+	public void setCapAnnotations(List<CAPAnnotation> capAnnotations) {
+		this.capAnnotations.clear();
+		this.capAnnotations.addAll(capAnnotations);
 	}
 
 	public void setFilename(String filename) {

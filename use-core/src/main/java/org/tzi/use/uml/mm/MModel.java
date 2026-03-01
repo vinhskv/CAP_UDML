@@ -95,6 +95,10 @@ public class MModel extends MModelElementImpl {
 		this.capAnnotations.addAll(capAnnotations);
 	}
 
+	public List<CAPAnnotation> getCapAnnotations() {
+		return this.capAnnotations;
+	}
+
 	public void setFilename(String filename) {
 		fFilename = filename;
 	}

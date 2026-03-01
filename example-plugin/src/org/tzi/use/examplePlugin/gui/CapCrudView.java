@@ -1,22 +1,15 @@
 package org.tzi.use.examplePlugin.gui;
 
-import org.tzi.use.examplePlugin.ast.ASTInterface;
 import org.tzi.use.examplePlugin.gui.create.CapCreateView;
 import org.tzi.use.examplePlugin.gui.management.CapManageView;
+import org.tzi.use.examplePlugin.gui.parse_file.FileParserView;
 import org.tzi.use.examplePlugin.gui.parser.CapParserView;
-import org.tzi.use.examplePlugin.parser.CAPCompiler;
-import org.tzi.use.examplePlugin.parser.CAPParser;
-import org.tzi.use.examplePlugin.util.ASTPrinter;
 import org.tzi.use.gui.main.MainWindow;
 import org.tzi.use.gui.main.ViewFrame;
 import org.tzi.use.gui.views.View;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.tzi.use.examplePlugin.util.GUIUtils.createCardButton;
 import static org.tzi.use.examplePlugin.util.GUIUtils.setMaximumFrameSize;
@@ -58,51 +51,18 @@ public class CapCrudView extends JPanel implements View {
         UIManager.getIcon("FileView.directoryIcon"),
         this::parseAnnotation
     ), gbc);
+
+    gbc.gridy++;
+
+    add(createCardButton(
+        "Parse CAP from File",
+        "Parse CAP specification from file",
+        UIManager.getIcon("FileView.directoryIcon"),
+        this::openFileParser
+    ), gbc);
   }
 
   private void parseAnnotation() {
-
-//    String annotation = """
-//                          @SumConstraint(
-//                         	name='cm04_total',  assocCls =@AssocCls(as1='Enrolment'),
-//                         	rolePath=@RolePath(r1='offering',r2='module'),
-//                         	collect1={ @AttrCond(attr='grade', minLim='C') },
-//                         	sumAttr='credits',
-//                         	collect2={ @AttrCond(attr='grade', minLim='C'),
-//                                     @AttrCond(attr='type',  matchVal='CORE') },
-//                         	sumAttr1='credits',
-//                         	fixAttr={@CompCond(val=sumAttr, maxLim=sumAttr1)}
-//                          )""";
-//
-//
-//    PrintWriter err = new PrintWriter(System.err);
-//    try {
-//      // 1. Create temp file
-//      Path tempFile = Files.createTempFile("cap-test-", ".cap");
-//
-//      // 2. Write annotation to file
-//      Files.writeString(tempFile, annotation);
-//
-//      // 3. Parse via existing compiler
-//      ASTInterface astInterface =
-//          CAPCompiler.compileSpecification(tempFile.toString(), err);
-//
-//      if (astInterface != null) {
-//        ASTPrinter.print(astInterface);
-//      }
-//      System.out.println("==============================");
-//
-////      CAPToOCLVisitor capToOCLVisitor = new CAPToOCLVisitor();
-////      String ocl = capToOCLVisitor.visitSumConstraint(astInterface);
-////
-////      System.out.println(ocl);
-//
-//      // 4. Optional: delete temp file
-//      Files.deleteIfExists(tempFile);
-//
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
 
     CapParserView parserView = new CapParserView();
     ViewFrame frame = new ViewFrame(
@@ -163,6 +123,23 @@ public class CapCrudView extends JPanel implements View {
     JComponent content = (JComponent) frame.getContentPane();
     content.setLayout(new BorderLayout());
     content.add(capView, BorderLayout.CENTER);
+
+    MainWindow.instance().addNewViewFrame(frame);
+    setMaximumFrameSize(frame);
+  }
+
+  private void openFileParser() {
+    FileParserView parserView = new FileParserView();
+    ViewFrame frame = new ViewFrame(
+        "CAP File Parser",
+        parserView,
+        "CommunicationDiagram.gif"
+    );
+
+    parserView.setFrame(frame);
+    JComponent content = (JComponent) frame.getContentPane();
+    content.setLayout(new BorderLayout());
+    content.add(parserView, BorderLayout.CENTER);
 
     MainWindow.instance().addNewViewFrame(frame);
     setMaximumFrameSize(frame);

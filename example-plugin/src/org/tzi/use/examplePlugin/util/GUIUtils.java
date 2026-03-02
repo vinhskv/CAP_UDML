@@ -4,6 +4,8 @@ import org.tzi.use.gui.main.ViewFrame;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 
 public class GUIUtils extends JPanel {
@@ -60,32 +62,63 @@ public class GUIUtils extends JPanel {
       Icon icon,
       Runnable action
   ) {
-    JPanel card = new JPanel(new BorderLayout(10, 10));
+    JPanel card = new JPanel();
+    card.setLayout(new BorderLayout());
     card.setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-        BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        BorderFactory.createEmptyBorder(20, 20, 20, 20)
     ));
     card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-    JLabel titleLabel = new JLabel(title);
-    titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 16f));
-
-    JLabel descLabel = new JLabel("<html><i>" + description + "</i></html>");
-
+    // ===== ICON =====
     JLabel iconLabel = new JLabel(icon);
     iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-    JPanel textPanel = new JPanel(new BorderLayout(5, 5));
-    textPanel.add(titleLabel, BorderLayout.NORTH);
-    textPanel.add(descLabel, BorderLayout.CENTER);
+    // ===== TITLE =====
+    JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+    titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 18f));
 
-    card.add(iconLabel, BorderLayout.WEST);
-    card.add(textPanel, BorderLayout.CENTER);
+    // ===== DESCRIPTION =====
+    JLabel descLabel = new JLabel(
+        "<html><div style='text-align:center;'>" + description + "</div></html>",
+        SwingConstants.CENTER
+    );
+    descLabel.setFont(descLabel.getFont().deriveFont(14f));
+    descLabel.setForeground(Color.DARK_GRAY);
 
-    card.addMouseListener(new java.awt.event.MouseAdapter() {
+    // ===== CENTER PANEL =====
+    JPanel centerPanel = new JPanel();
+    centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+    centerPanel.setOpaque(false);
+
+    iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    centerPanel.add(iconLabel);
+    centerPanel.add(Box.createVerticalStrut(10));
+    centerPanel.add(titleLabel);
+    centerPanel.add(Box.createVerticalStrut(6));
+    centerPanel.add(descLabel);
+
+    card.add(centerPanel, BorderLayout.CENTER);
+
+    // ===== CLICK =====
+    card.addMouseListener(new MouseAdapter() {
       @Override
-      public void mouseClicked(java.awt.event.MouseEvent e) {
+      public void mouseClicked(MouseEvent e) {
         action.run();
+      }
+
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        card.setBackground(new Color(245, 245, 245));
+        card.setOpaque(true);
+      }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+        card.setOpaque(false);
       }
     });
 

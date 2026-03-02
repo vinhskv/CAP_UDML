@@ -10,56 +10,96 @@ import org.tzi.use.gui.views.View;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.tzi.use.examplePlugin.util.GUIUtils.createCardButton;
 import static org.tzi.use.examplePlugin.util.GUIUtils.setMaximumFrameSize;
 
 public class CapCrudView extends JPanel implements View {
 
+  private final List<JComponent> cards = new ArrayList<>();
+
   public CapCrudView() {
     setLayout(new GridBagLayout());
     setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
     setFocusable(true);
 
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(15, 15, 15, 15);
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-
-    add(createCardButton(
+    cards.add(createCardButton(
         "Create CAP",
         "Create a new CAP specification",
         UIManager.getIcon("FileView.fileIcon"),
         this::openCreateCap
-    ), gbc);
+    ));
 
-    gbc.gridy++;
-
-    add(createCardButton(
+    cards.add(createCardButton(
         "Manage CAP",
         "View, edit, delete and open diagrams",
         UIManager.getIcon("FileView.directoryIcon"),
         this::openManageCap
-    ), gbc);
+    ));
 
-    gbc.gridy++;
-
-    add(createCardButton(
+    cards.add(createCardButton(
         "Convert Annotation to OCL",
         "Convert from Annotation to OCL",
         UIManager.getIcon("FileView.directoryIcon"),
         this::parseAnnotation
-    ), gbc);
+    ));
 
-    gbc.gridy++;
-
-    add(createCardButton(
+    cards.add(createCardButton(
         "Parse CAP from File",
         "Parse CAP specification from file",
         UIManager.getIcon("FileView.directoryIcon"),
         this::openFileParser
-    ), gbc);
+    ));
+
+    rebuildLayout(getColumnCount());
+
+    // Responsive khi resize
+    addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        rebuildLayout(getColumnCount());
+      }
+    });
+  }
+
+  private int getColumnCount() {
+    int width = getWidth();
+    if (width < 600) {
+      return 1;
+    }
+    return 2;
+  }
+
+  private void rebuildLayout(int columns) {
+    removeAll();
+    setLayout(new GridBagLayout());
+
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(15, 15, 15, 15);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.weightx = 1.0;
+
+    int x = 0;
+    int y = 0;
+
+    for (JComponent card : cards) {
+      gbc.gridx = x;
+      gbc.gridy = y;
+      add(card, gbc);
+
+      x++;
+      if (x == columns) {
+        x = 0;
+        y++;
+      }
+    }
+
+    revalidate();
+    repaint();
   }
 
   private void parseAnnotation() {

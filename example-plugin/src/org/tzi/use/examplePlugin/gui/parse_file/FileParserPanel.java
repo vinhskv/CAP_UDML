@@ -44,6 +44,7 @@ public class FileParserPanel extends JPanel {
 
     JScrollPane leftScroll = new JScrollPane(leftTextArea);
     leftScroll.setBorder(BorderFactory.createTitledBorder("Input File"));
+    leftScroll.setRowHeaderView(new LineNumberView(leftTextArea));
 
     JButton uploadButton = new JButton("Upload File");
     JPanel leftPanel = new JPanel(new BorderLayout(5, 5));
@@ -59,13 +60,21 @@ public class FileParserPanel extends JPanel {
 
     JScrollPane rightScroll = new JScrollPane(rightTextArea);
     rightScroll.setBorder(BorderFactory.createTitledBorder("Output File"));
+    rightScroll.setRowHeaderView(new LineNumberView(rightTextArea));
 
     JButton downloadButton = new JButton("Download File");
+    JButton validateButton = new JButton("Validate .use");
+
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 5));
+    buttonPanel.add(validateButton);
+    buttonPanel.add(downloadButton);
+
     JPanel rightPanel = new JPanel(new BorderLayout(5, 5));
     rightPanel.add(rightScroll, BorderLayout.CENTER);
-    rightPanel.add(downloadButton, BorderLayout.SOUTH);
+    rightPanel.add(buttonPanel, BorderLayout.SOUTH);
 
     downloadButton.addActionListener(e -> downloadFile());
+    validateButton.addActionListener(e -> validateUseFile());
 
     // ===== SPLIT PANE =====
     JSplitPane splitPane = new JSplitPane(
@@ -87,6 +96,16 @@ public class FileParserPanel extends JPanel {
     // ===== ADD TO MAIN =====
     add(splitPane, BorderLayout.CENTER);
     add(centerPanel, BorderLayout.SOUTH);
+  }
+
+  private void validateUseFile() {
+    System.out.println("Validating USE file...");
+    String useText = rightTextArea.getText();
+
+    MModel model = compileUseModelFromString(useText, this);
+    if (model != null) {
+      JOptionPane.showMessageDialog(this, "The .use file is valid!", "Validation Success", JOptionPane.INFORMATION_MESSAGE);
+    }
   }
 
   // ===================== ACTIONS =====================
@@ -129,6 +148,27 @@ public class FileParserPanel extends JPanel {
   }
 
   private void convertFile() {
+
+    // clear previous output
+    try {
+      saveContentToFixedFile(
+          "",
+          "D:/DATN/use/example-plugin/src/resources/temp/temp-core.txt"
+      );
+      saveContentToFixedFile(
+          "",
+          "D:/DATN/use/example-plugin/src/resources/temp/temp-ocl.txt"
+      );
+    } catch (IOException e) {
+      JOptionPane.showMessageDialog(
+          this,
+          "Failed to reset temp files",
+          "Error",
+          JOptionPane.ERROR_MESSAGE
+      );
+      return;
+    }
+
     if (inputFile == null) {
       JOptionPane.showMessageDialog(this, "Please upload a file first!");
       return;

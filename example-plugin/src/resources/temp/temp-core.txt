@@ -32,20 +32,3 @@ association WorksFor between
 end
 
 -- constraints
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -8,6 +8,7 @@ import java.util.List;
 public class RetakeConstraintType1 implements RetakeConstraintInterface {
   String assocCls;
   String rolePath;
+  String targetAssoc;
 
   List<AttrCondPro> filters;
   String sumAttr;

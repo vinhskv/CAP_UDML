@@ -25,7 +25,7 @@ public class SizeConstraintType1Generator implements SizeConstraintGenerator<Siz
     // collect part
     String allowedCond = null;
     if (sc1.filters != null) {
-      allowedCond = buildAllowedCondition(sc1.filters, RootScope.NONE);
+      allowedCond = buildAllowedCondition(sc1.filters, RootScope.NONE, null);
     }
     System.out.println("Allowed Condition: " + allowedCond);
 

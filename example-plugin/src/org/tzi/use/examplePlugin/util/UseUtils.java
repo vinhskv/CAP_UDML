@@ -135,6 +135,19 @@ public class UseUtils {
     return false;
   }
 
+  public static boolean hasKeyEqualsToValue(ASTInterface astInterface, String key, Object value) {
+    if (!hasSpecificKey(astInterface, key)) {
+      return false;
+    }
+
+    Object v = astInterface.args.get(key);
+    if (v == null || value == null) {
+      return false;
+    }
+
+    return v.toString().equals(value.toString());
+  }
+
   /**
    * Convert CAPAnnotation to ASTInterface
    * CAPAnnotation is the original format parsed from USE,

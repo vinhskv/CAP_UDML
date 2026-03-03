@@ -11,6 +11,8 @@ public class ConstraintKindDetector {
       case "ScheduleConstraint" -> ConstraintKind.SCHEDULE;
       case "SizeConstraint" -> ConstraintKind.SIZE;
       case "EligibilityConstraint" -> ConstraintKind.ELIGIBILITY;
+      case "StatusConstraint" -> ConstraintKind.STATUS;
+      case "RetakeConstraint" -> ConstraintKind.RETAKE;
 
       default -> ConstraintKind.UNKNOWN;
     };

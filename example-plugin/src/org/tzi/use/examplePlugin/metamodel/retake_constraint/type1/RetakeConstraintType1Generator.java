@@ -26,7 +26,8 @@ public class RetakeConstraintType1Generator implements RetakeConstraintGenerator
       allowedCond1 =
           buildAllowedCondition(
               List.of(rc1.filters.get(0)),
-              RootScope.NONE
+              RootScope.NONE,
+              null
           );
 
       // forAll(2)
@@ -34,7 +35,8 @@ public class RetakeConstraintType1Generator implements RetakeConstraintGenerator
         allowedCond2 =
             buildAllowedCondition(
                 rc1.filters.subList(1, rc1.filters.size()),
-                RootScope.ALL
+                RootScope.FIRST_ONLY,
+                "a"
             );
       }
     }
@@ -44,13 +46,15 @@ public class RetakeConstraintType1Generator implements RetakeConstraintGenerator
 
 
     return """
-    context %s
-    inv %s:
-      %s
-    """.formatted(
+        context %s inv %s:
+          self.%s->forAll(e | %s(self)
+            ->forAll(a | %s))
+        """.formatted(
         contextClass,
         invariantName,
-        "abc"
+        rc1.targetAssoc,
+        allowedCond1,
+        allowedCond2
     );
   }
 }

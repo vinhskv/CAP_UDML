@@ -17,6 +17,7 @@ import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.COLLECT;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.MAX;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ROLE_PATH;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.SUM_ATTR;
+import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.TARGET_ASSOC;
 import static org.tzi.use.examplePlugin.util.ParserUtil.parseCheckForExi;
 import static org.tzi.use.examplePlugin.util.ParserUtil.parseIfPart;
 import static org.tzi.use.examplePlugin.util.UseUtils.asString;
@@ -35,6 +36,7 @@ public class RetakeConstraintType1Parser implements RetakeConstraintParser<Retak
     // assocCls and rolePath
     rc1.assocCls = (String) args.get(ASSOC_CLS);
     rc1.rolePath = (String) args.get(ROLE_PATH);
+    rc1.targetAssoc = (String) args.get(TARGET_ASSOC);
 
     // sumAttr and max
     rc1.sumAttr = asString(args.get(SUM_ATTR));
@@ -116,6 +118,12 @@ public class RetakeConstraintType1Parser implements RetakeConstraintParser<Retak
       } else if (condArgs.containsKey("minAttr")) {
         c.type = AttrCondPro.Type.MIN_ATTR;
         c.matchAttr = String.valueOf(condArgs.get("minAttr"));
+      } else if (condArgs.containsKey("minValue")) {
+        c.type = AttrCondPro.Type.MIN_LIM;
+        c.matchAttr = String.valueOf(condArgs.get("minValue"));
+      } else if (condArgs.containsKey("maxValue")) {
+        c.type = AttrCondPro.Type.MAX_LIM;
+        c.matchAttr = String.valueOf(condArgs.get("maxValue"));
       }
 
       c.attrs = ParserUtil.parseAttrsFromCondArgs(condArgs);

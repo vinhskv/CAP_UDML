@@ -1,5 +1,6 @@
 package org.tzi.use.examplePlugin.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.tzi.use.examplePlugin.metamodel.AttrCondPro;
 import org.tzi.use.examplePlugin.metamodel.IfPart;
 import org.tzi.use.examplePlugin.metamodel.OperatorValue;
@@ -166,7 +167,8 @@ public class GeneratorUtils {
    */
   public static String buildAllowedCondition(
       List<AttrCondPro> filters,
-      RootScope scope
+      RootScope scope,
+      @Nullable String iterator
   ) {
     System.out.println("Building allowed condition for filters: " + filters + " with scope: " + scope);
     int lastIndex = filters.size() - 1;
@@ -176,7 +178,9 @@ public class GeneratorUtils {
         .mapToObj(i -> buildSingleAllowedCondition(
             filters.get(i),
             scope,
-            i == lastIndex
+            i == lastIndex,
+            i == 0,
+            iterator
         ))
         .collect(Collectors.joining(" and "));
   }
@@ -191,7 +195,8 @@ public class GeneratorUtils {
    */
   public static String buildAllowedOrCondition(
       List<AttrCondPro> filters,
-      RootScope scope
+      RootScope scope,
+      @Nullable String iterator
   ) {
     System.out.println("Building allowed condition for filters: " + filters + " with scope: " + scope);
     int lastIndex = filters.size() - 1;
@@ -202,7 +207,9 @@ public class GeneratorUtils {
         .mapToObj(i -> buildSingleAllowedCondition(
             filters.get(i),
             scope,
-            i == lastIndex
+            i == lastIndex,
+            i == 0,
+            iterator
         ))
         .collect(Collectors.joining(" or "));
   }
@@ -210,23 +217,38 @@ public class GeneratorUtils {
   private static String buildSingleAllowedCondition(
       AttrCondPro c,
       RootScope scope,
-      boolean isLast
+      boolean isLast,
+      boolean isFirst,
+      @Nullable String iterator
   ) {
 
     System.out.println("Condition type is: " + c.type);
     String root;
-    if (scope == RootScope.ALL) {
-      root = "self";
-    } else if (scope == RootScope.LAST_ONLY && isLast) {
-      root = "self";
-    } else {
-      root = "e";
+    boolean hasIterator = iterator != null && !iterator.isEmpty();
+
+    switch (scope) {
+      case ALL -> root = "self";
+
+      case LAST_ONLY -> {
+        if (isLast) root = "self";
+        else root = hasIterator ? iterator : "e";
+      }
+
+      case FIRST_ONLY -> {
+        if (isFirst && hasIterator) root = iterator;
+        else root = "self";
+      }
+
+      default -> root = hasIterator ? iterator : "e";
     }
 
     String right = "";
     if (c.scale != null && !c.scale.isEmpty()) {
       right = c.scale + " * " + root + "." + c.attrs.get(0) + "." + c.matchAttr;
-    } else if (isNumber(c.matchAttr)) {
+    } else if (isNumber(c.matchAttr)
+        || c.type == AttrCondPro.Type.MIN_LIM
+        || c.type == AttrCondPro.Type.MAX_LIM) {
+      // in case matchAttr is a number or it's a limit, we treat it as a value, not a path
       right = c.matchAttr.toString();
     } else {
       right = root + "." + c.matchAttr;
@@ -276,7 +298,7 @@ public class GeneratorUtils {
       return "true";
     }
 
-    String body = buildAllowedCondition(conds, RootScope.NONE);
+    String body = buildAllowedCondition(conds, RootScope.NONE, null);
     return "self." + collection + "->exists(e | " + body + ")";
   }
 
@@ -299,7 +321,7 @@ public class GeneratorUtils {
 
     return conds.stream()
         .map(c -> {
-          String cond = buildSingleAllowedCondition(c, RootScope.NONE, true);
+          String cond = buildSingleAllowedCondition(c, RootScope.NONE, true, false, null);
           return "self." + collection + "->exists(e | " + cond + ")";
         })
         .collect(Collectors.joining(" " + joinOp + " "));

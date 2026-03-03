@@ -17,7 +17,7 @@ public class TimeConstraintType1Generator implements TimeConstraintGenerator<Tim
     System.out.println("Implies Part: " + impliesPart);
     boolean hasIfPart = impliesPart != null && !impliesPart.isBlank();
 
-    String checkForExi = buildAllowedCondition(sc1.checkForExi, RootScope.ALL);
+    String checkForExi = buildAllowedCondition(sc1.checkForExi, RootScope.ALL, null);
     System.out.println("CheckForExi Condition: " + checkForExi);
 
 

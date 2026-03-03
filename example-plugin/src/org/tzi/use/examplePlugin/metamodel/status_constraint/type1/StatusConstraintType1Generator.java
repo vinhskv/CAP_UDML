@@ -22,7 +22,7 @@ public class StatusConstraintType1Generator implements StatusConstraintGenerator
     // check status part
     String allowedCond = null;
     if (sc1.checkStatus != null) {
-      allowedCond = buildAllowedCondition(sc1.checkStatus, RootScope.ALL);
+      allowedCond = buildAllowedCondition(sc1.checkStatus, RootScope.ALL, null);
     }
     System.out.println("Status Condition: " + allowedCond);
 

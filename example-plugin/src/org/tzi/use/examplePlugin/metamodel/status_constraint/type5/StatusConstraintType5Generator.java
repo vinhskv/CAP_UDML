@@ -22,7 +22,7 @@ public class StatusConstraintType5Generator implements StatusConstraintGenerator
     // check status part
     String allowedCond = null;
     if (sc5.checkStatus != null) {
-      allowedCond = buildAllowedCondition(sc5.checkStatus, RootScope.ALL);
+      allowedCond = buildAllowedCondition(sc5.checkStatus, RootScope.ALL, null);
     }
     System.out.println("Status Condition: " + allowedCond);
 

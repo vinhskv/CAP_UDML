@@ -5,7 +5,6 @@ import org.tzi.use.examplePlugin.metamodel.schedule_constraint.ScheduleConstrain
 
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.AND;
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildAllowedOrCondition;
-import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildExistsCheckCondition;
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildExistsCheckConditionEach;
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.buildIfCondition;
 import static org.tzi.use.examplePlugin.util.GeneratorUtils.indent;
@@ -15,7 +14,7 @@ public class ScheduleConstraintType2Generator implements ScheduleConstraintGener
   public String generate(String contextClass, String invariantName, ScheduleConstraintType2 sc2) {
     String ifCond = buildIfCondition(sc2.ifParts, "iter");
     String checkForExi = buildExistsCheckConditionEach(sc2.rolePath, sc2.checkForExi, AND);
-    String altPart = buildAllowedOrCondition(sc2.altParts, RootScope.ALL);
+    String altPart = buildAllowedOrCondition(sc2.altParts, RootScope.ALL, null);
     String iter = "iter";
 
     String body;

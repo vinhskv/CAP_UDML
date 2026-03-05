@@ -1,5 +1,5 @@
-bin/
-target/
-
-.settings/
-.project
+#bin/
+#target/
+#
+#.settings/
+#.project

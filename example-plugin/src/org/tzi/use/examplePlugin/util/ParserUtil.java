@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ARGS;
+import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.ATTR_EXISTS;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.CHECK_FOR_EXI;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.RATIO;
 import static org.tzi.use.examplePlugin.metamodel.CommonAttributes.SCALE;
@@ -197,7 +198,7 @@ public class ParserUtil {
   /**
    * Parse checkForExi conditions from the given arguments. It looks for a list of conditions under the specified key (defaulting to CHECK_FOR_EXI) and converts each condition into an AttrCondPro object.
    * @param args
-   * @param key
+   * @param key by default, it looks for CHECK_FOR_EXI, but it can be customized to look for other keys that have the same structure.
    * @return
    */
   public static List<AttrCondPro> parseCheckForExi(
@@ -226,6 +227,7 @@ public class ParserUtil {
       c.attrs = ParserUtil.parseAttrsFromCondArgs(condArgs);
       c.refs = ParserUtil.parseRefsFromCondArgs(condArgs);
       c.neg = Boolean.TRUE.equals(condArgs.get("neg"));
+      c.insideExistValue = asString(condArgs.get(ATTR_EXISTS));
 
       // scale or ratio
       Object scale = condArgs.get(SCALE);
@@ -278,6 +280,9 @@ public class ParserUtil {
       } else if (condArgs.containsKey("fixStr")) {
         c.type = AttrCondPro.Type.FIX_STR;
         c.matchAttr = String.valueOf(condArgs.get("fixStr"));
+      } else if (condArgs.containsKey("matchAttr")) {
+        c.type = AttrCondPro.Type.MATCH_ATTR;
+        c.matchAttr = String.valueOf(condArgs.get("matchAttr"));
       }
 
       attrConds.add(c);

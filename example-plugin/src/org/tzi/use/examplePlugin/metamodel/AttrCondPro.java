@@ -13,6 +13,10 @@ public class AttrCondPro {
   // like plus = 21, minus = 45, times = 42, div = 47...
   public OperatorValue operatorAndValue;
 
+  // inside exist check, e.g: exists(e|e.course=c))
+  // course is the value @AttrCond(attr="enrolments", attrExists="course", matchAttr="self") }
+  public String insideExistValue;
+
   public enum Type {
     MIN_LIM,
     MAX_LIM,

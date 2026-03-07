@@ -2,10 +2,12 @@ package org.tzi.use.examplePlugin.metamodel.retake_constraint;
 
 import org.tzi.use.examplePlugin.metamodel.retake_constraint.type1.RetakeConstraintType1Generator;
 import org.tzi.use.examplePlugin.metamodel.retake_constraint.type1.RetakeConstraintType1Parser;
+import org.tzi.use.examplePlugin.metamodel.retake_constraint.type2.RetakeConstraintType2Generator;
+import org.tzi.use.examplePlugin.metamodel.retake_constraint.type2.RetakeConstraintType2Parser;
 
 public enum RetakeConstraintType {
   TYPE1(new RetakeConstraintType1Parser(), new RetakeConstraintType1Generator()),
-  TYPE2(null, null),
+  TYPE2(new RetakeConstraintType2Parser(), new RetakeConstraintType2Generator()),
   TYPE3(null, null),
   TYPE4(null, null),
   TYPE5(null, null),

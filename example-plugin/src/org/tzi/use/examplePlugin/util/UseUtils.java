@@ -52,6 +52,7 @@ public class UseUtils {
 
   /**
    * Check for has specific key in args
+   *
    * @param astInterface
    * @param key
    * @return
@@ -62,6 +63,7 @@ public class UseUtils {
 
   /**
    * Check if value is number
+   *
    * @param value the object value
    * @return
    */
@@ -100,8 +102,41 @@ public class UseUtils {
   }
 
   /**
+   * Check for key equals to value in specific conditions, such as ifPart, checkForExi... and whatever conditions that we will have in the future
+   * <p>
+   * E.g: check for matchAttr equals to "self" in checkForExi condition, check for timeAttr equals to "enrollmentDate" in ifPart condition, etc.
+   *
+   * @param astInterface
+   * @param key
+   * @param value
+   * @return
+   */
+  public static boolean hasKeyEqualsToValueInSpecificParam(
+      ASTInterface astInterface, String key, String value, String param) {
+
+    Object raw = astInterface.args.get(param);
+
+    if (!(raw instanceof List<?> list)) {
+      return false;
+    }
+
+    for (Object o : list) {
+      if (o instanceof ASTInterface cond) {
+        Map<String, Object> args = cond.args;
+
+        if (value.equals(asString(args.get(key)))) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Check if any of the keys in the list exists in the specific conditions
    * Check for key in ifPart, checkForExi... and whatever conditions that we will have in the future
+   *
    * @param astInterface
    * @param key
    * @return
@@ -152,8 +187,9 @@ public class UseUtils {
    * Convert CAPAnnotation to ASTInterface
    * CAPAnnotation is the original format parsed from USE,
    * we convert it to ASTInterface for easier processing in our plugin
-   *
+   * <p>
    * This is a deep conversion, it will recursively convert nested CAPAnnotation and lists
+   *
    * @param capAnnotation
    * @return the ASTInterface representation of the CAPAnnotation, it will have the same structure and data as the original CAPAnnotation, but in a more convenient format for our plugin
    */
@@ -197,6 +233,7 @@ public class UseUtils {
   /**
    * The main executor for constraints, it will dispatch to different executors based on the type of constraint
    * Generate the OCL string for the ASTInterface, the context is the class that the constraint is attached to, and the name is the name of the constraint
+   *
    * @param astInterface
    * @param astJson
    * @param context

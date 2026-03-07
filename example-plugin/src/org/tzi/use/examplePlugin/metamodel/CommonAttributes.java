@@ -40,4 +40,7 @@ public class CommonAttributes {
 
   // status constraint specific
   public static final String CHECK_STATUS = "checkStatus";
+
+  // retake constraint specific
+  public static final String ATTR_EXISTS = "attrExists";
 }

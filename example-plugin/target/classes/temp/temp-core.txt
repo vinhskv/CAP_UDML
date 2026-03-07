@@ -32,3 +32,43 @@ association WorksFor between
 end
 
 -- constraints
+
+constraints
+
+context Person inv ageCheck:
+  self.age >= 18
+
+context Person inv checkLocation:
+  self.employer.location = 'Hanoi'
+
+context Person::raiseSalary(rate : Real) : Real
+  post raiseSalaryPost: 
+    salary = salary@pre * (1.0 + rate)
+  post resultPost:
+    result = salary
+
+context Company::hire(p : Person)
+  pre  hirePre1: p.isDefined()
+  pre  hirePre2: employee->excludes(p)
+  post hirePost: employee->includes(p)
+
+context Company::fire(p : Person)
+  pre  firePre:  employee->includes(p)
+  post firePost: employee->excludes(p)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

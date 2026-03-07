@@ -76,9 +76,9 @@ public class GeneratorUtils {
 
     String cond;
     switch (c.ifFixType) {
-      case MIN_LIM, MIN_LIM_ATTR, MIN_VALUE -> cond = left + " > " + right;
+      case MIN_LIM, MIN_LIM_ATTR, MIN_VALUE, MIN -> cond = left + " > " + right;
 
-      case MAX_LIM, MAX_LIM_ATTR, MAX_VALUE -> cond = left + " < " + right;
+      case MAX_LIM, MAX_LIM_ATTR, MAX_VALUE, MAX -> cond = left + " < " + right;
 
       case MATCH_ATTR, FIX_ATTR -> cond = left + " = " + right;
 
@@ -367,10 +367,10 @@ public class GeneratorUtils {
               cond = path + " = '" + c.ifFixValue + "'";
             }
 
-            case MIN_LIM, MIN_VALUE ->
+            case MIN_LIM, MIN_VALUE, MIN ->
               cond = path + " >= " + c.ifFixValue;
 
-            case MAX_LIM, MAX_VALUE ->
+            case MAX_LIM, MAX_VALUE, MAX ->
               cond = path + " <= " + c.ifFixValue;
 
             default -> throw new RuntimeException(
